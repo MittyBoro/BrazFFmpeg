@@ -1,7 +1,8 @@
 services:
   laravel.test:
+    hostname: laravelffmpeg
     build:
-      context: ./vendor/laravel/sail/runtimes/8.3
+      context: ./docker/8.3
       dockerfile: Dockerfile
       args:
         WWWGROUP: "${WWWGROUP}"
@@ -20,8 +21,34 @@ services:
       - ".:/var/www/html"
     networks:
       - sail
+      - global_network
     depends_on:
       - redis
+  mysql:
+    image: 'mysql/mysql-server:8.0'
+    ports:
+      - '${FORWARD_DB_PORT:-4306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - 'sail-mysql:/var/lib/mysql'
+      - './docker/mysql/create-testing-database.sh:/docker-entrypoint-initdb.d/10-create-testing-database.sh'
+    networks:
+      - sail
+    healthcheck:
+      test:
+        - CMD
+        - mysqladmin
+        - ping
+        - '-p${DB_PASSWORD}'
+      retries: 3
+      timeout: 5s
+
   redis:
     image: "redis:alpine"
     ports:
@@ -37,16 +64,13 @@ services:
         - ping
       retries: 3
       timeout: 5s
-  ffmpeg:
-    image: jrottenberg/ffmpeg:4.3-nvidia1804
-    networks:
-      - sail
-      - network
 networks:
   sail:
     driver: bridge
-  network:
-    driver: bridge
+  global_network:
+    external: true
 volumes:
   sail-redis:
+    driver: local
+  sail-mysql:
     driver: local
