@@ -14,3 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('/info', 'InfoController@index');
+Route::get('/info', 'InfoController@index');
+
+Route::get('/shot', 'ShotController@index');

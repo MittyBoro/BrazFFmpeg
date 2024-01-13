@@ -1,7 +1,7 @@
 services:
   laravel.test:
     build:
-      context: ./vendor/laravel/sail/runtimes/8.3
+      context: ./docker/8.3
       dockerfile: Dockerfile
       args:
         WWWGROUP: "${WWWGROUP}"
@@ -20,8 +20,10 @@ services:
       - ".:/var/www/html"
     networks:
       - sail
+      - network
     depends_on:
       - redis
+
   redis:
     image: "redis:alpine"
     ports:
@@ -37,11 +39,6 @@ services:
         - ping
       retries: 3
       timeout: 5s
-  ffmpeg:
-    image: jrottenberg/ffmpeg:4.3-nvidia1804
-    networks:
-      - sail
-      - network
 networks:
   sail:
     driver: bridge
