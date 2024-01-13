@@ -1,0 +1,12 @@
+{
+  "plugins": ["@prettier/plugin-php"],
+  "parser": "php",
+  "phpVersion": "8.2",
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": false,
+  "singleQuote": true,
+  "vueIndentScriptAndStyle": true,
+  "htmlWhitespaceSensitivity": "ignore",
+  "printWidth": 80
+}
