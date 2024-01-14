@@ -91,8 +91,24 @@ class IndexController extends Controller
     ]);
 
     $data['start'] = $data['start'] ?? 0;
+    $data['size'] = $data['size'] ?? 480;
 
     ProcessVideo::dispatch('trailer', $data);
+
+    return response()->json(['success' => true]);
+  }
+
+  // создать размер
+  public function resize(Request $request)
+  {
+    $data = $request->validate([
+      'id' => 'required',
+      'src' => 'required|url',
+
+      'size' => 'required|numeric|between:200,5000',
+    ]);
+
+    ProcessVideo::dispatch('resize', $data);
 
     return response()->json(['success' => true]);
   }

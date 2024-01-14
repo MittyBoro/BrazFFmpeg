@@ -8,9 +8,10 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 
-class ProcessVideo implements ShouldQueue
+class ProcessVideo implements ShouldQueue, ShouldBeUnique
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -32,24 +33,30 @@ class ProcessVideo implements ShouldQueue
   /**
    * Execute the job.
    */
-  public function handle(): void
+  public function handle()
   {
     $this->service = FFmpegService::init($this->data['id'], $this->data['src']);
 
+    $result = null;
+
     if ($this->type === 'images') {
-      $this->makeImages();
+      $result = $this->makeImages();
     } elseif ($this->type === 'thumbnails') {
-      $this->makeThumbnails();
+      $result = $this->makeThumbnails();
     } elseif ($this->type === 'trailer') {
-      $this->makeTrailer();
+      $result = $this->makeTrailer();
+    } elseif ($this->type === 'resize') {
+      $result = $this->makeResize();
     }
+
+    return $result;
   }
 
   private function makeImages()
   {
     ProgressImages::dispatch($this->data);
 
-    $this->service->makeImages(
+    return $this->service->makeImages(
       $this->data['start'],
       $this->data['count'],
       $this->data['size'],
@@ -58,16 +65,21 @@ class ProcessVideo implements ShouldQueue
 
   private function makeThumbnails()
   {
-    $this->service->makeThumbnails();
+    return $this->service->makeThumbnails();
   }
 
   private function makeTrailer()
   {
-    $this->service->makeTrailer(
+    return $this->service->makeTrailer(
       $this->data['start'],
       $this->data['count'],
       $this->data['duration'],
       $this->data['size'],
     );
+  }
+
+  private function makeResize()
+  {
+    return $this->service->makeResize($this->data['size']);
   }
 }

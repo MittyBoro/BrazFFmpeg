@@ -25,7 +25,7 @@ trait ImagesTrait
         ->save($this->storage->getPath("/img_{$int}.jpg"));
     }
 
-    $this->state->finish($this->storage->urls());
+    return $this->state->finish($this->storage->urls());
   }
 
   public function makeThumbnails()
@@ -66,12 +66,9 @@ trait ImagesTrait
           ->grid($cols, $rows)
           ->generateVTT($this->storage->getPath('thumbnails.vtt'));
       })
-      ->onProgress(function ($percentage, $remaining) {
-        $this->state->progress($percentage);
-      })
       ->save($this->storage->getPath('thumbnails.jpg'));
 
-    $this->state->finish($this->storage->urls());
+    return $this->state->finish($this->storage->urls());
   }
 
   // статус выполнения makeImages

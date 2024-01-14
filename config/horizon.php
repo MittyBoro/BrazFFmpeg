@@ -3,8 +3,7 @@
 use Illuminate\Support\Str;
 
 return [
-
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Horizon Domain
     |--------------------------------------------------------------------------
@@ -15,9 +14,9 @@ return [
     |
     */
 
-    'domain' => env('HORIZON_DOMAIN'),
+  'domain' => env('HORIZON_DOMAIN'),
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Horizon Path
     |--------------------------------------------------------------------------
@@ -28,9 +27,9 @@ return [
     |
     */
 
-    'path' => env('HORIZON_PATH', 'horizon'),
+  'path' => env('HORIZON_PATH', 'horizon'),
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Horizon Redis Connection
     |--------------------------------------------------------------------------
@@ -41,9 +40,9 @@ return [
     |
     */
 
-    'use' => 'default',
+  'use' => 'default',
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Horizon Redis Prefix
     |--------------------------------------------------------------------------
@@ -54,12 +53,12 @@ return [
     |
     */
 
-    'prefix' => env(
-        'HORIZON_PREFIX',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_horizon:'
-    ),
+  'prefix' => env(
+    'HORIZON_PREFIX',
+    Str::slug(env('APP_NAME', 'laravel'), '_') . '_horizon:',
+  ),
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Horizon Route Middleware
     |--------------------------------------------------------------------------
@@ -70,9 +69,9 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+  'middleware' => ['web'],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Queue Wait Time Thresholds
     |--------------------------------------------------------------------------
@@ -83,11 +82,11 @@ return [
     |
     */
 
-    'waits' => [
-        'redis:default' => 60,
-    ],
+  'waits' => [
+    'redis:default' => 60,
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Job Trimming Times
     |--------------------------------------------------------------------------
@@ -98,16 +97,16 @@ return [
     |
     */
 
-    'trim' => [
-        'recent' => 60,
-        'pending' => 60,
-        'completed' => 60,
-        'recent_failed' => 10080,
-        'failed' => 10080,
-        'monitored' => 10080,
-    ],
+  'trim' => [
+    'recent' => 60,
+    'pending' => 60,
+    'completed' => 60,
+    'recent_failed' => 10080,
+    'failed' => 10080,
+    'monitored' => 10080,
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Silenced Jobs
     |--------------------------------------------------------------------------
@@ -118,11 +117,11 @@ return [
     |
     */
 
-    'silenced' => [
-        // App\Jobs\ExampleJob::class,
-    ],
+  'silenced' => [
+    // App\Jobs\ExampleJob::class,
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Metrics
     |--------------------------------------------------------------------------
@@ -133,14 +132,14 @@ return [
     |
     */
 
-    'metrics' => [
-        'trim_snapshots' => [
-            'job' => 24,
-            'queue' => 24,
-        ],
+  'metrics' => [
+    'trim_snapshots' => [
+      'job' => 24,
+      'queue' => 24,
     ],
+  ],
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Fast Termination
     |--------------------------------------------------------------------------
@@ -153,9 +152,9 @@ return [
     |
     */
 
-    'fast_termination' => false,
+  'fast_termination' => false,
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Memory Limit (MB)
     |--------------------------------------------------------------------------
@@ -166,9 +165,9 @@ return [
     |
     */
 
-    'memory_limit' => 64,
+  'memory_limit' => 64,
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Queue Worker Configuration
     |--------------------------------------------------------------------------
@@ -179,35 +178,35 @@ return [
     |
     */
 
-    'defaults' => [
-        'supervisor-1' => [
-            'connection' => 'redis',
-            'queue' => ['default'],
-            'balance' => 'auto',
-            'autoScalingStrategy' => 'time',
-            'maxProcesses' => 1,
-            'maxTime' => 0,
-            'maxJobs' => 0,
-            'memory' => 128,
-            'tries' => 1,
-            'timeout' => 60,
-            'nice' => 0,
-        ],
+  'defaults' => [
+    'supervisor-1' => [
+      'connection' => 'redis',
+      'queue' => ['default'],
+      'balance' => 'auto',
+      'autoScalingStrategy' => 'time',
+      'maxProcesses' => 1,
+      'maxTime' => 0,
+      'maxJobs' => 0,
+      'memory' => 512,
+      'tries' => 1,
+      'timeout' => 7200,
+      'nice' => 0,
+    ],
+  ],
+
+  'environments' => [
+    'production' => [
+      'supervisor-1' => [
+        'maxProcesses' => 10,
+        'balanceMaxShift' => 1,
+        'balanceCooldown' => 3,
+      ],
     ],
 
-    'environments' => [
-        'production' => [
-            'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-            ],
-        ],
-
-        'local' => [
-            'supervisor-1' => [
-                'maxProcesses' => 3,
-            ],
-        ],
+    'local' => [
+      'supervisor-1' => [
+        'maxProcesses' => 2,
+      ],
     ],
+  ],
 ];

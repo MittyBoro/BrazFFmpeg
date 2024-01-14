@@ -2,6 +2,8 @@
 
 namespace App\Services\FFmpeg;
 
+use Carbon\Carbon;
+
 class StateService
 {
   private $id;
@@ -22,6 +24,7 @@ class StateService
   {
     $this->db->set('type', $type);
     $this->db->set('progress', 0);
+    $this->db->set('start', now());
     $this->db->set('done', 0);
   }
 
@@ -30,6 +33,10 @@ class StateService
     $this->db->set('done', 1);
     $this->db->set('progress', 100);
     $this->db->set('result', $result);
+    $this->db->set('end', now());
+
+    $duration = Carbon::parse($this->db->get('start'))->diffInSeconds(now());
+    $this->db->set('duration', $duration);
   }
 
   public function progress($percentage)

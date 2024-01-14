@@ -3,15 +3,15 @@
 namespace App\Services\FFmpeg;
 
 use App\Services\FFmpeg\Traits\ImagesTrait;
-use FFMpeg\Coordinate\Dimension;
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\Filters\Video\VideoFilters;
-use FFMpeg\Format\Video\X264;
+use App\Services\FFmpeg\Traits\ResizeTrait;
+use App\Services\FFmpeg\Traits\TrailerTrait;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class FFmpegService
 {
   use ImagesTrait;
+  use ResizeTrait;
+  use TrailerTrait;
 
   private $id;
   private $ffmpeg;
@@ -31,7 +31,7 @@ class FFmpegService
 
   public static function init($id, $src)
   {
-    $src = str_replace('127.0.0.1', 'minio1', $src);
+    $src = str_replace('127.0.0.1', 'minio', $src);
     return new self($id, $src);
   }
 
@@ -50,49 +50,14 @@ class FFmpegService
   {
     ['width' => $oldWidth, 'height' => $oldHeight] = $this->getInfo();
 
-    return intval(($height * $oldWidth) / $oldHeight);
+    $w = intval(($height * $oldWidth) / $oldHeight);
+    return ceil($w / 2) * 2;
   }
   private function heightByWidth($with)
   {
     ['width' => $oldWidth, 'height' => $oldHeight] = $this->getInfo();
 
-    return intval(($with * $oldHeight) / $oldWidth);
-  }
-
-  // 'sizes', 'trailer',
-  public function makeTrailer($start, $count, $duration, $height)
-  {
-    $this->state->start('screenshots');
-
-    $file = $this->storage->getPath('/trailer.mp4');
-
-    $interval = intval($this->ffmpeg->getDurationInSeconds() / $count); // interval between each clip
-
-    $width = $this->widthByHeight($height);
-
-    $video = $this->ffmpeg
-      ->export()
-      ->getFrameFromSeconds($start)
-      ->inFormat(new X264())
-      ->resize(new Dimension($width, $height))
-      // ->synchronize()
-      ->onProgress(function ($percentage, $remaining) {
-        $this->state->progress($percentage);
-      });
-
-    for ($i = 0; $i < $count; $i++) {
-      $clipStart = $start + $i * $interval;
-      $clipEnd = $clipStart + $duration;
-
-      $video->addFilter(
-        fn(VideoFilters $filters) => $filters->clip(
-          TimeCode::fromSeconds($clipStart),
-          TimeCode::fromSeconds($clipEnd),
-        ),
-      );
-    }
-    $video->save($file);
-
-    $this->state->finish([$file]);
+    $h = intval(($with * $oldHeight) / $oldWidth);
+    return ceil($h / 2) * 2;
   }
 }
