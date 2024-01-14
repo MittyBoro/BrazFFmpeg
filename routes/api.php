@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/info', 'InfoController@index');
-Route::get('/info', 'InfoController@index');
+Route::get('/state/{id}', 'IndexController@state');
+Route::get('/delete/{id}', 'IndexController@delete');
 
-Route::get('/shot', 'ShotController@index');
+Route::get('/info', 'IndexController@info');
+Route::get('/images', 'IndexController@images');
+Route::get('/thumbnails', 'IndexController@thumbnails');
+Route::get('/trailer', 'IndexController@trailer');
