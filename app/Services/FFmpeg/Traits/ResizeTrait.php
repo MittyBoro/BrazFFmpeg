@@ -3,27 +3,39 @@
 namespace App\Services\FFmpeg\Traits;
 
 use FFMpeg\Coordinate\Dimension;
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\Filters\Video\VideoFilters;
 use FFMpeg\Format\Video\X264;
 
 trait ResizeTrait
 {
   // 'trailer',
-  public function makeResize($height)
+  public function makeResize($quality)
   {
-    $lowBitrate = (new X264())->setKiloBitrate(250);
-    $midBitrate = (new X264())->setKiloBitrate(500);
-    $highBitrate = (new X264())->setKiloBitrate(1000);
-    $superBitrate = (new X264())->setKiloBitrate(1500);
+    $lowBitrate = (new X264())->setKiloBitrate(256);
+    $midBitrate = (new X264())->setKiloBitrate(512);
+    $highBitrate = (new X264())->setKiloBitrate(1024);
+    $megaBitrate = (new X264())->setKiloBitrate(2048);
+    $superBitrate = (new X264())->setKiloBitrate(4096);
+
+    if ($quality <= 240) {
+      $bitrate = $lowBitrate;
+    } elseif ($quality <= 320) {
+      $bitrate = $midBitrate;
+    } elseif ($quality <= 480) {
+      $bitrate = $highBitrate;
+    } elseif ($quality <= 720) {
+      $bitrate = $megaBitrate;
+    } else {
+      $bitrate = $superBitrate;
+    }
 
     $this->state->start('resize');
 
-    $width = $this->widthByHeight($height);
+    $height = intval($quality);
+    $width = $this->widthByHeight($quality);
 
     $video = $this->ffmpeg
       ->export()
-      ->inFormat(new X264())
+      ->inFormat($bitrate)
       ->resize(new Dimension($width, $height))
       ->synchronize()
       ->onProgress(function ($percentage, $remaining) {

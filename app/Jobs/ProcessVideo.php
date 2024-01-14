@@ -3,13 +3,14 @@
 namespace App\Jobs;
 
 use App\Services\FFmpeg\FFmpegService;
+use App\Services\FFmpeg\StateService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class ProcessVideo implements ShouldQueue, ShouldBeUnique
 {
@@ -52,6 +53,13 @@ class ProcessVideo implements ShouldQueue, ShouldBeUnique
     return $result;
   }
 
+  public function failed(Throwable $exception)
+  {
+    $stateService = StateService::init($this->data['id']);
+
+    $stateService->fail($exception->getMessage());
+  }
+
   private function makeImages()
   {
     ProgressImages::dispatch($this->data);
@@ -59,7 +67,6 @@ class ProcessVideo implements ShouldQueue, ShouldBeUnique
     return $this->service->makeImages(
       $this->data['start'],
       $this->data['count'],
-      $this->data['size'],
     );
   }
 
@@ -74,12 +81,12 @@ class ProcessVideo implements ShouldQueue, ShouldBeUnique
       $this->data['start'],
       $this->data['count'],
       $this->data['duration'],
-      $this->data['size'],
+      $this->data['quality'],
     );
   }
 
   private function makeResize()
   {
-    return $this->service->makeResize($this->data['size']);
+    return $this->service->makeResize($this->data['quality']);
   }
 }

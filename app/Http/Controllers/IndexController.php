@@ -14,14 +14,13 @@ class IndexController extends Controller
   const TYPES = ['images', 'trailer', 'resize'];
 
   // информация о видео
-  public function info(Request $request)
+  public function info(Request $request, $id)
   {
     $data = $request->validate([
-      'id' => 'required',
       'src' => 'required|url',
     ]);
 
-    $service = FFmpegService::init($data['id'], $data['src']);
+    $service = FFmpegService::init($id, $data['src']);
 
     return $service->getInfo();
   }
@@ -45,19 +44,19 @@ class IndexController extends Controller
   }
 
   // создать изображения
-  public function images(Request $request)
+  public function images(Request $request, $id)
   {
     $data = $request->validate([
-      'id' => 'required',
       'src' => 'required|url',
 
       'start' => 'nullable|numeric|between:0,100000',
       'count' => 'nullable|numeric|between:1,500',
     ]);
 
+    $data['id'] = $id;
+
     $data['start'] = $data['start'] ?? 0;
     $data['count'] = $data['count'] ?? 1;
-    $data['size'] = $data['size'] ?? 1080;
 
     ProcessVideo::dispatch('images', $data);
 
@@ -65,12 +64,13 @@ class IndexController extends Controller
   }
 
   // создать изображения
-  public function thumbnails(Request $request)
+  public function thumbnails(Request $request, $id)
   {
     $data = $request->validate([
-      'id' => 'required',
       'src' => 'required|url',
     ]);
+
+    $data['id'] = $id;
 
     ProcessVideo::dispatch('thumbnails', $data);
 
@@ -78,20 +78,21 @@ class IndexController extends Controller
   }
 
   // создать трейлер
-  public function trailer(Request $request)
+  public function trailer(Request $request, $id)
   {
     $data = $request->validate([
-      'id' => 'required',
       'src' => 'required|url',
 
       'start' => 'nullable|numeric|between:0,100000',
       'count' => 'required|numeric|between:1,100',
       'duration' => 'required|numeric|between:1,100',
-      'size' => 'nullable|numeric|between:200,5000',
+      'quality' => 'nullable|numeric|between:200,5000',
     ]);
 
+    $data['id'] = $id;
+
     $data['start'] = $data['start'] ?? 0;
-    $data['size'] = $data['size'] ?? 480;
+    $data['quality'] = $data['quality'] ?? 480;
 
     ProcessVideo::dispatch('trailer', $data);
 
@@ -99,14 +100,14 @@ class IndexController extends Controller
   }
 
   // создать размер
-  public function resize(Request $request)
+  public function resize(Request $request, $id)
   {
     $data = $request->validate([
-      'id' => 'required',
       'src' => 'required|url',
-
-      'size' => 'required|numeric|between:200,5000',
+      'quality' => 'required|numeric|between:200,5000',
     ]);
+
+    $data['id'] = $id;
 
     ProcessVideo::dispatch('resize', $data);
 

@@ -39,6 +39,12 @@ class StateService
     $this->db->set('duration', $duration);
   }
 
+  public function fail($result)
+  {
+    $this->finish(null);
+    $this->db->set('error', $result);
+  }
+
   public function progress($percentage)
   {
     $this->db->set('progress', $percentage);

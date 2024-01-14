@@ -14,10 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/state/{id}', 'IndexController@state');
-Route::get('/delete/{id}', 'IndexController@delete');
+Route::prefix('{id}')->group(function () {
+  Route::get('/state', 'IndexController@state');
+  Route::post('/delete', 'IndexController@delete');
 
-Route::get('/info', 'IndexController@info');
-Route::get('/images', 'IndexController@images');
-Route::get('/thumbnails', 'IndexController@thumbnails');
-Route::get('/trailer', 'IndexController@trailer');
+  Route::post('/info', 'IndexController@info');
+  Route::post('/images', 'IndexController@images');
+  Route::post('/thumbnails', 'IndexController@thumbnails');
+  Route::post('/trailer', 'IndexController@trailer');
+  Route::post('/resize', 'IndexController@resize');
+});

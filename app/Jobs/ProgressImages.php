@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Services\FFmpeg\VideoService;
+use App\Services\FFmpeg\FFmpegService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,6 +15,7 @@ class ProgressImages implements ShouldQueue
 
   public $timeout = 300;
   public $tries = 1;
+  public $failOnTimeout = false;
 
   protected $data = [];
   protected $id;
@@ -34,7 +35,7 @@ class ProgressImages implements ShouldQueue
    */
   public function handle(): void
   {
-    $service = VideoService::init($this->data['id'], $this->data['src']);
+    $service = FFmpegService::init($this->data['id'], $this->data['src']);
 
     do {
       sleep($this->sleep);
