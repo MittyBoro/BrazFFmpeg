@@ -1,5 +1,5 @@
 services:
-  laravelffmpeg:
+  laravel.test:
     hostname: laravelffmpeg
     build:
       context: ./docker/8.3
@@ -21,7 +21,7 @@ services:
       - ".:/var/www/html"
     networks:
       - sail
-      - network
+      - global_network
     depends_on:
       - redis
 
@@ -43,8 +43,8 @@ services:
 networks:
   sail:
     driver: bridge
-  network:
-    driver: bridge
+  global_network:
+    external: true
 volumes:
   sail-redis:
     driver: local

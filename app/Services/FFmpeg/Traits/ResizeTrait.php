@@ -36,8 +36,7 @@ trait ResizeTrait
     $video = $this->ffmpeg
       ->export()
       ->inFormat($bitrate)
-      ->resize(new Dimension($width, $height))
-      ->synchronize()
+      ->resize($width, $height)
       ->onProgress(function ($percentage, $remaining) {
         $this->state->progress($percentage);
       });

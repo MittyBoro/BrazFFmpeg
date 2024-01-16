@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 
 class IndexController extends Controller
 {
-  const TYPES = ['images', 'trailer', 'resize'];
-
   // информация о видео
   public function info(Request $request, $id)
   {
