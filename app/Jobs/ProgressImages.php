@@ -39,11 +39,7 @@ class ProgressImages implements ShouldQueue
 
     do {
       sleep($this->sleep);
-      $done = $service->statusImages($this->data['count']);
-
-      if (!is_integer($done)) {
-        $done = 1;
-      }
-    } while (!$done);
+      $task = $service->statusImages($this->data['count']);
+    } while ($task->isProcessing());
   }
 }

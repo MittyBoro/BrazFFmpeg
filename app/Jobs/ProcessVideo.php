@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Services\FFmpeg\FFmpegService;
-use App\Services\FFmpeg\StateService;
+use App\Services\FFmpeg\TaskService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Throwable;
 
-class ProcessVideo implements ShouldQueue, ShouldBeUnique
+class ProcessVideo implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -36,7 +36,11 @@ class ProcessVideo implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
-    $this->service = FFmpegService::init($this->data['id'], $this->data['src']);
+    $this->service = FFmpegService::init(
+      $this->data['id'],
+      $this->data['src'],
+      $this->data,
+    );
 
     switch ($this->type) {
       case 'images':
@@ -56,14 +60,14 @@ class ProcessVideo implements ShouldQueue, ShouldBeUnique
 
   public function failed(Throwable $exception)
   {
-    $stateService = StateService::init($this->data['id']);
+    $taskService = TaskService::init($this->data['id']);
 
-    $stateService->fail($exception->getMessage());
+    $taskService->fail($exception->getMessage());
   }
 
   private function makeImages()
   {
-    ProgressImages::dispatch($this->data);
+    ProgressImages::dispatch($this->data)->onQueue('additional');
 
     $this->service->makeImages($this->data['start'], $this->data['count']);
   }

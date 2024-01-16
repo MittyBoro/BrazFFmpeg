@@ -14,7 +14,7 @@ trait TrailerTrait
   // 'trailer',
   public function makeTrailer($start, $count, $duration, $height)
   {
-    $this->state->start('trailer');
+    $this->task->start('trailer');
 
     $file = $this->storage->getPath('trailer.mp4');
 
@@ -43,10 +43,10 @@ trait TrailerTrait
       ->export()
       ->inFormat((new X264())->setKiloBitrate(512))
       ->onProgress(function ($percentage, $remaining) {
-        $this->state->progress($percentage);
+        $this->task->progress($percentage);
       })
       ->save($file);
 
-    return $this->state->finish($this->storage->urls());
+    return $this->task->finish($this->storage->urls());
   }
 }

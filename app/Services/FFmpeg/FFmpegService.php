@@ -16,23 +16,26 @@ class FFmpegService
   private $id;
   private $ffmpeg;
 
-  private $state;
+  private $task;
   private $storage;
 
-  public function __construct($id, $src)
+  public function __construct($id, $src, array $data = [])
   {
-    $this->id = $id;
+    $this->id = (int) $id;
 
     $this->ffmpeg = FFMpeg::openUrl($src);
 
-    $this->state = StateService::init($this->id);
-    $this->storage = StorageService::init($this->id);
+    if ($this->id) {
+      $this->storage = StorageService::init($this->id);
+      $this->task = TaskService::init($this->id, $data);
+      $this->storage->delete();
+    }
   }
 
-  public static function init($id, $src)
+  public static function init($id, $src, array $data = [])
   {
     $src = str_replace('127.0.0.1', 'minio', $src);
-    return new self($id, $src);
+    return new self($id, $src, $data);
   }
 
   public function getInfo()

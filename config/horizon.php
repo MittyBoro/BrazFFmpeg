@@ -192,6 +192,13 @@ return [
       'timeout' => 7200,
       'nice' => 0,
     ],
+    'supervisor-2' => [
+      'connection' => 'redis',
+      'queue' => ['additional'],
+      'maxProcesses' => 1,
+      'maxTime' => 0,
+      'maxJobs' => 0,
+    ],
   ],
 
   'environments' => [
@@ -205,7 +212,12 @@ return [
 
     'local' => [
       'supervisor-1' => [
-        'maxProcesses' => 2,
+        'queue' => ['default'],
+        'maxProcesses' => 1,
+      ],
+      'supervisor-2' => [
+        'queue' => ['additional'],
+        'maxProcesses' => 1,
       ],
     ],
   ],

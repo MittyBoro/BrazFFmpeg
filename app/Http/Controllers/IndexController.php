@@ -5,28 +5,28 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessVideo;
 use App\Services\FFmpeg\DBService;
 use App\Services\FFmpeg\FFmpegService;
-use App\Services\FFmpeg\StateService;
 use App\Services\FFmpeg\StorageService;
+use App\Services\FFmpeg\TaskService;
 use Illuminate\Http\Request;
 
 class IndexController extends Controller
 {
   // информация о видео
-  public function info(Request $request, $id)
+  public function info(Request $request)
   {
     $data = $request->validate([
       'src' => 'required|url',
     ]);
 
-    $service = FFmpegService::init($id, $data['src']);
+    $service = FFmpegService::init(0, $data['src']);
 
     return $service->getInfo();
   }
 
-  // статистика по процессу
+  // состояние процесса
   public function state($id)
   {
-    $service = StateService::init($id);
+    $service = TaskService::init($id);
     $list = $service->all();
 
     return response()->json($list);
@@ -36,7 +36,6 @@ class IndexController extends Controller
   public function delete($id)
   {
     StorageService::init($id)->delete();
-    DBService::init($id)->delete();
 
     return response()->json(['success' => true]);
   }

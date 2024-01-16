@@ -18,7 +18,7 @@ trait ResizeTrait
 
     if ($quality <= 240) {
       $bitrate = $lowBitrate;
-    } elseif ($quality <= 320) {
+    } elseif ($quality <= 360) {
       $bitrate = $midBitrate;
     } elseif ($quality <= 480) {
       $bitrate = $highBitrate;
@@ -28,7 +28,7 @@ trait ResizeTrait
       $bitrate = $superBitrate;
     }
 
-    $this->state->start('resize');
+    $this->task->start('resize');
 
     $height = intval($quality);
     $width = $this->widthByHeight($quality);
@@ -38,11 +38,11 @@ trait ResizeTrait
       ->inFormat($bitrate)
       ->resize($width, $height)
       ->onProgress(function ($percentage, $remaining) {
-        $this->state->progress($percentage);
+        $this->task->progress($percentage);
       });
 
     $video->save($this->storage->getPath('result.mp4'));
 
-    return $this->state->finish($this->storage->urls());
+    return $this->task->finish($this->storage->urls());
   }
 }
