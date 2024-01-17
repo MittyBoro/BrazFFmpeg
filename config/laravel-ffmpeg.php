@@ -11,7 +11,7 @@ return [
     'binaries' => env('FFPROBE_BINARIES', 'ffprobe'),
   ],
 
-  'timeout' => 7200,
+  'timeout' => 10800,
 
   'log_channel' => env('LOG_CHANNEL', 'stack'), // set to false to completely disable logging
 

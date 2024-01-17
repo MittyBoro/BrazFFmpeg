@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessVideo;
+use App\Jobs\ProcessVideoJob;
 use App\Services\FFmpeg\DBService;
 use App\Services\FFmpeg\FFmpegService;
 use App\Services\FFmpeg\StorageService;
@@ -32,14 +32,6 @@ class IndexController extends Controller
     return response()->json($list);
   }
 
-  // статистика по процессу
-  public function delete($id)
-  {
-    StorageService::init($id)->delete();
-
-    return response()->json(['success' => true]);
-  }
-
   // создать изображения
   public function images(Request $request, $id)
   {
@@ -55,7 +47,7 @@ class IndexController extends Controller
     $data['start'] = $data['start'] ?? 0;
     $data['count'] = $data['count'] ?? 1;
 
-    ProcessVideo::dispatch('images', $data);
+    ProcessVideoJob::dispatch('images', $data);
 
     return response()->json(['success' => true]);
   }
@@ -69,7 +61,7 @@ class IndexController extends Controller
 
     $data['id'] = $id;
 
-    ProcessVideo::dispatch('thumbnails', $data);
+    ProcessVideoJob::dispatch('thumbnails', $data);
 
     return response()->json(['success' => true]);
   }
@@ -91,7 +83,7 @@ class IndexController extends Controller
     $data['start'] = $data['start'] ?? 0;
     $data['quality'] = $data['quality'] ?? 480;
 
-    ProcessVideo::dispatch('trailer', $data);
+    ProcessVideoJob::dispatch('trailer', $data);
 
     return response()->json(['success' => true]);
   }
@@ -106,7 +98,7 @@ class IndexController extends Controller
 
     $data['id'] = $id;
 
-    ProcessVideo::dispatch('resize', $data);
+    ProcessVideoJob::dispatch('resize', $data);
 
     return response()->json(['success' => true]);
   }

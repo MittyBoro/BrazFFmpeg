@@ -13,7 +13,7 @@ class StorageService
   {
     $this->id = $id;
 
-    $this->directory = '/' . $this->id;
+    $this->directory = '/video/' . $this->id;
   }
 
   public static function init($id)
