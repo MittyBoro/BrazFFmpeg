@@ -12,11 +12,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Throwable;
 
-class ProcessVideo implements ShouldQueue
+class ProcessVideoJob implements ShouldQueue
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public $timeout = 7200; // 2 hours
+  public $timeout = 10800; // 3 hours
 
   protected $data = [];
   protected $type;
@@ -40,6 +40,7 @@ class ProcessVideo implements ShouldQueue
       $this->data['id'],
       $this->data['src'],
       $this->data,
+      true,
     );
 
     switch ($this->type) {
@@ -67,7 +68,7 @@ class ProcessVideo implements ShouldQueue
 
   private function makeImages()
   {
-    ProgressImages::dispatch($this->data)->onQueue('additional');
+    ProgressImagesJob::dispatch($this->data)->onQueue('additional');
 
     $this->service->makeImages($this->data['start'], $this->data['count']);
   }

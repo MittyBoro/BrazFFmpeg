@@ -23,7 +23,7 @@ trait ImagesTrait
         ->getFrameFromSeconds($second)
         ->export()
 
-        ->save($this->storage->getPath("/img_{$int}.jpg"));
+        ->save($this->storage->getPath("img_{$int}.jpg"));
     }
 
     return $this->task->finish($this->storage->urls());

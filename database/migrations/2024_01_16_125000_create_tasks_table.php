@@ -22,6 +22,8 @@ return new class extends Migration {
       $table->json('config')->default(new Expression('(JSON_ARRAY())'));
       $table->json('result')->default(new Expression('(JSON_ARRAY())'));
 
+      $table->boolean('is_cleaned')->default(false);
+
       $table->timestamps();
     });
   }

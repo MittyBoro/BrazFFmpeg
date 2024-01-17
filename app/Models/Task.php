@@ -20,6 +20,7 @@ class Task extends Model
     'duration',
     'config',
     'result',
+    'is_cleaned',
   ];
 
   protected $casts = [
@@ -27,5 +28,6 @@ class Task extends Model
     'duration' => 'int',
     'config' => 'collection',
     'result' => 'collection',
+    'is_cleaned' => 'bool',
   ];
 }

@@ -5,6 +5,7 @@ namespace App\Services\FFmpeg;
 use App\Services\FFmpeg\Traits\ImagesTrait;
 use App\Services\FFmpeg\Traits\ResizeTrait;
 use App\Services\FFmpeg\Traits\TrailerTrait;
+use Illuminate\Support\Facades\Http;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class FFmpegService
@@ -19,15 +20,23 @@ class FFmpegService
   private $task;
   private $storage;
 
-  public function __construct($id, $src, array $data = [])
+  public function __construct($id, $src, array $data = [], $clearDir = false)
   {
     $this->id = (int) $id;
+
+    $head = Http::head($src);
+    if ($head->failed()) {
+      throw new \Exception("Video {$src} not found");
+    }
 
     $this->ffmpeg = FFMpeg::openUrl($src);
 
     if ($this->id) {
       $this->storage = StorageService::init($this->id);
       $this->task = TaskService::init($this->id, $data);
+    }
+
+    if ($clearDir) {
       $this->storage->delete();
     }
   }
