@@ -43,8 +43,6 @@ class ProcessVideoJob implements ShouldQueue
       true,
     );
 
-    \Log::info('ProcessVideoJob', [$this->data]);
-
     switch ($this->type) {
       case 'images':
         $this->makeImages();

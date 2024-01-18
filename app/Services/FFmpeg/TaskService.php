@@ -12,7 +12,6 @@ class TaskService
   public function __construct($id, array $data = [])
   {
     $this->model = Task::firstOrCreate(['id' => $id]);
-    \Log::info('TaskService', [$data]);
     if (!empty($data)) {
       $this->model->config = $data;
       $this->model->save();
@@ -31,6 +30,7 @@ class TaskService
     $this->model->progress = 0;
     $this->model->created_at = now();
     $this->model->save();
+    \Log::info('TaskService', [$type, $this->model]);
   }
 
   public function finish($result)

@@ -17,7 +17,7 @@ class ProgressImagesJob implements ShouldQueue
   public $tries = 1;
   public $failOnTimeout = false;
 
-  protected $data = [];
+  protected array $data = [];
   protected $id;
 
   private $sleep = 1;
