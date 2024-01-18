@@ -21,8 +21,10 @@ trait ImagesTrait
       $int = str_pad($v, 5, '0', STR_PAD_LEFT);
       $media = $media
         ->getFrameFromSeconds($second)
-        ->export()
+        ->addFilter('-preset', 'ultrafast')
+        ->addFilter('-filter:v', '-fps=fps=1')
 
+        ->export()
         ->save($this->storage->getPath("img_{$int}.jpg"));
     }
 
@@ -67,6 +69,8 @@ trait ImagesTrait
           ->grid($cols, $rows)
           ->generateVTT($this->storage->getPath('thumbnails.vtt'));
       })
+      ->addFilter('-preset', 'ultrafast')
+      ->addFilter('-filter:v', '-fps=fps=1')
       ->save($this->storage->getPath('thumbnails.jpg'));
 
     return $this->task->finish($this->storage->urls());

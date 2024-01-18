@@ -36,8 +36,8 @@ trait ResizeTrait
     $video = $this->ffmpeg
       ->export()
       ->addFilter(
-        '-fpsmax',
-        '60', // Установка максимального значения кадров в секунду
+        '-r',
+        '30',
         '-preset',
         'ultrafast', // Выбор предустановки ultrafast для кодирования (очень быстрое кодирование)
         '-c:a',
