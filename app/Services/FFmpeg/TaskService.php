@@ -12,6 +12,7 @@ class TaskService
   public function __construct($id, array $data = [])
   {
     $this->model = Task::firstOrCreate(['id' => $id]);
+    \Log::info(json_encode($data));
     if (!empty($data)) {
       $this->model->config = $data;
       $this->model->save();
