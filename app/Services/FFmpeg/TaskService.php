@@ -30,7 +30,6 @@ class TaskService
     $this->model->progress = 0;
     $this->model->created_at = now();
     $this->model->save();
-    \Log::info('TaskService', [$type, $this->model]);
   }
 
   public function finish($result)
