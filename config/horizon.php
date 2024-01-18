@@ -211,19 +211,18 @@ return [
   'environments' => [
     'production' => [
       'supervisor-1' => [
-        'maxProcesses' => 10,
-        'balanceMaxShift' => 1,
-        'balanceCooldown' => 3,
+        'maxProcesses' => 1,
+      ],
+      'supervisor-2' => [
+        'maxProcesses' => 1,
       ],
     ],
 
     'local' => [
       'supervisor-1' => [
-        'queue' => ['default'],
         'maxProcesses' => 1,
       ],
       'supervisor-2' => [
-        'queue' => ['additional'],
         'maxProcesses' => 1,
       ],
     ],
