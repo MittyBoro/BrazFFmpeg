@@ -36,13 +36,10 @@ class CleanTasks extends Command
 
     foreach ($tasks as $task) {
       // Добавьте здесь свои действия
-      $this->info("Cleaning task {$task->id}...");
 
       StorageService::init($task->id)->delete();
 
       $task->update(['is_cleaned' => true]);
     }
-
-    $this->info("Tasks cleaned successfully ({$tasks->count()})");
   }
 }

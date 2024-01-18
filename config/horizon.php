@@ -69,7 +69,8 @@ return [
     |
     */
 
-  'middleware' => ['web'],
+  'middleware' =>
+    config('app.env') !== 'local' ? ['web', 'auth.basic'] : ['web'],
 
   /*
     |--------------------------------------------------------------------------
