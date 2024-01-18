@@ -43,7 +43,7 @@ class ProcessVideoJob implements ShouldQueue
       true,
     );
 
-    \Log::info('ProcessVideoJob', json_encode($this->data));
+    \Log::info('ProcessVideoJob', [$this->data]);
 
     switch ($this->type) {
       case 'images':
