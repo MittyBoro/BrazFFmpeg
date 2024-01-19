@@ -21,7 +21,7 @@ class ProgressImagesJob implements ShouldQueue, ShouldBeUnique
   protected array $data = [];
   protected $id;
 
-  private $sleep = 1;
+  private $sleep = 5;
 
   /**
    * Create a new job instance.

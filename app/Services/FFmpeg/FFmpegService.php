@@ -14,7 +14,6 @@ class FFmpegService
   use ResizeTrait;
   use TrailerTrait;
 
-  private $id;
   private $ffmpeg;
 
   private $task;
@@ -22,8 +21,6 @@ class FFmpegService
 
   public function __construct($id, $src, array $data = [], $clearDir = false)
   {
-    $this->id = (int) $id;
-
     $head = Http::head($src);
     if ($head->failed()) {
       throw new \Exception("Video {$src} not found");
@@ -31,9 +28,9 @@ class FFmpegService
 
     $this->ffmpeg = FFMpeg::openUrl($src);
 
-    if ($this->id) {
-      $this->storage = StorageService::init($this->id);
-      $this->task = TaskService::init($this->id, $data);
+    if ($id) {
+      $this->storage = StorageService::init($id);
+      $this->task = TaskService::init($id, $data);
     }
 
     if ($clearDir) {

@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Storage;
 
 class StorageService
 {
-  private $id;
   private $directory;
 
   public function __construct($id)
   {
-    $this->id = $id;
-
-    $this->directory = '/video/' . $this->id;
+    $this->directory = '/video/' . $id;
   }
 
   public static function init($id)

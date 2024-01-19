@@ -2,7 +2,6 @@
 
 namespace App\Services\FFmpeg\Traits;
 
-use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Format\Video\X264;
 
 trait ResizeTrait
