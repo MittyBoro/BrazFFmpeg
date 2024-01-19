@@ -35,7 +35,7 @@ class CleanTasks extends Command
       ->get()
       ->each(function ($task) {
         StorageService::init($task->id)->delete();
-        $task->update(['is_cleaned' => true]);
+        $task->update(['status' => Task::STATUS_CLEANED]);
       });
   }
 }
