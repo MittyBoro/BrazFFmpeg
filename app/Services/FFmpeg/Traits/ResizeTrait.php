@@ -27,8 +27,6 @@ trait ResizeTrait
       $bitrate = $superBitrate;
     }
 
-    $this->task->start('resize');
-
     $height = intval($quality);
     $width = $this->widthByHeight($quality);
 
@@ -58,7 +56,5 @@ trait ResizeTrait
       });
 
     $video->save($this->storage->getPath('result.mp4'));
-
-    return $this->task->finish($this->storage->urls());
   }
 }

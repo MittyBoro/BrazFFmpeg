@@ -7,30 +7,31 @@ use Carbon\Carbon;
 
 class TaskService
 {
-  private $model;
+  private Task $model;
 
-  public function __construct($id, array $data = [])
+  public function __construct($id)
   {
     $this->model = Task::find($id);
-    if (!$this->model) {
-      $this->model = new Task();
-      $this->model->id = $id;
-    }
-    if (!empty($data)) {
-      $this->model->config = $data;
-      $this->model->save();
-    }
   }
 
-  public static function init($id, array $data = [])
+  public static function init($id)
   {
-    return new self($id, $data);
+    return new self($id);
   }
 
-  public function start($type)
+  public static function create($id, $type, array $data = [])
+  {
+    return Task::create([
+      'id' => $id,
+      'type' => $type,
+      'status' => Task::STATUS_QUEUED,
+      'data' => $data,
+    ]);
+  }
+
+  public function start()
   {
     $this->model->status = Task::STATUS_PROCESSING;
-    $this->model->type = $type;
     $this->model->progress = 0;
     $this->model->created_at = now();
     $this->model->save();
@@ -39,23 +40,30 @@ class TaskService
 
   public function finish($result)
   {
-    $this->model->status = $result ? Task::STATUS_SUCCESS : Task::STATUS_ERROR;
-    $this->model->progress = 100;
-    $this->model->result = $result ?? [];
-    $this->model->duration = Carbon::parse(
-      $this->model->created_at,
-    )->diffInSeconds(now());
-    $this->model->save();
-    \Log::info(
-      "Task {$this->model->id} [{$this->model->type}] finished: {$this->model->status}",
-    );
+    $this->model->status = Task::STATUS_SUCCESS;
+    $this->stop($result);
+
+    \Log::info("Task {$this->model->id} [{$this->model->type}] success");
   }
 
   public function fail($result)
   {
     $this->model->status = Task::STATUS_ERROR;
+    $this->stop(['error' => $result]);
+
+    \Log::info(
+      "Task {$this->model->id} [{$this->model->type}] error: {$result}",
+    );
+  }
+
+  private function stop($result)
+  {
     $this->model->result = $result ?? [];
-    $this->finish(null);
+    $this->model->progress = 100;
+    $this->model->duration = Carbon::parse(
+      $this->model->created_at,
+    )->diffInSeconds(now());
+    $this->model->save();
   }
 
   public function progress($percentage)
@@ -63,20 +71,23 @@ class TaskService
     $this->model->update(['progress' => $percentage]);
   }
 
-  public function isProcessing()
-  {
-    $this->model->refresh();
-    return $this->model->status == Task::STATUS_PROCESSING;
-  }
-
   public function get($key)
   {
     return $this->model->{$key};
   }
 
-  public function all()
+  public function getData($key)
   {
-    $this->model->refresh();
-    return $this->model;
+    return $this->model->data->get($key);
+  }
+
+  public function getType()
+  {
+    return $this->model->type;
+  }
+
+  public function isStarted()
+  {
+    return $this->model->status !== Task::STATUS_QUEUED;
   }
 }

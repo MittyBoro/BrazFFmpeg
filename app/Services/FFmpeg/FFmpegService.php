@@ -16,38 +16,72 @@ class FFmpegService
 
   private $ffmpeg;
 
-  private $task;
-  private $storage;
+  private TaskService $task;
+  private StorageService $storage;
 
-  public function __construct($id, $src, array $data = [], $clearDir = false)
+  public function __construct($id)
   {
-    $head = Http::head($src);
-    if ($head->failed()) {
-      throw new \Exception("Video {$src} not found");
-    }
+    $this->storage = StorageService::init($id);
+    $this->task = TaskService::init($id);
+
+    $src = $this->task->getData('src');
+    $this->checkSrc($src);
 
     $this->ffmpeg = FFMpeg::openUrl($src);
+    $this->storage->delete();
+  }
 
-    if ($id) {
-      $this->storage = StorageService::init($id);
-      $this->task = TaskService::init($id, $data);
+  public static function init($id)
+  {
+    return new self($id);
+  }
+
+  public function start()
+  {
+    if ($this->task->isStarted()) {
+      return;
     }
 
-    if ($clearDir) {
-      $this->storage->delete();
+    $type = $this->task->getType();
+    $this->task->start();
+
+    switch ($type) {
+      case 'images':
+        $this->makeImages(
+          $this->task->getData('start'),
+          $this->task->getData('count'),
+        );
+        break;
+      case 'thumbnails':
+        $this->makeThumbnails();
+        break;
+      case 'trailer':
+        $this->makeTrailer(
+          $this->task->getData('start'),
+          $this->task->getData('count'),
+          $this->task->getData('duration'),
+          $this->task->getData('quality'),
+        );
+        break;
+      case 'resize':
+        $this->makeResize($this->task->getData('quality'));
+        break;
+    }
+
+    $result = $this->storage->urls();
+
+    if (!count($result)) {
+      $this->task->fail('Files not found');
+    } else {
+      $this->task->finish($result);
     }
   }
 
-  public static function init($id, $src, array $data = [], $clearDir = false)
+  public static function videoInfo($src)
   {
-    $src = str_replace('127.0.0.1', 'minio', $src);
-    return new self($id, $src, $data);
-  }
-
-  public function getInfo()
-  {
-    $dimensions = $this->ffmpeg->getVideoStream()->getDimensions();
-    $duration = $this->ffmpeg->getDurationInSeconds();
+    $ffmpeg = FFMpeg::openUrl($src);
+    $dimensions = $ffmpeg->getVideoStream()->getDimensions();
+    $duration = $ffmpeg->getDurationInSeconds();
     return [
       'width' => $dimensions->getWidth(),
       'height' => $dimensions->getHeight(),
@@ -55,16 +89,33 @@ class FFmpegService
     ];
   }
 
+  private function checkSrc($src)
+  {
+    $head = Http::head($src);
+    if ($head->failed()) {
+      throw new \Exception("Video {$src} not found");
+    }
+  }
+
+  private function getDimensions()
+  {
+    $dimensions = $this->ffmpeg->getVideoStream()->getDimensions();
+    return [
+      'width' => $dimensions->getWidth(),
+      'height' => $dimensions->getHeight(),
+    ];
+  }
+
   private function widthByHeight($height)
   {
-    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getInfo();
+    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getDimensions();
 
     $w = intval(($height * $oldWidth) / $oldHeight);
     return ceil($w / 2) * 2;
   }
   private function heightByWidth($with)
   {
-    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getInfo();
+    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getDimensions();
 
     $h = intval(($with * $oldHeight) / $oldWidth);
     return ceil($h / 2) * 2;

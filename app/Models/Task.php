@@ -6,28 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Task extends Model
 {
+  // sync with BrazApp FFmpegService
   const STATUS_QUEUED = 'queued';
   const STATUS_PROCESSING = 'processing';
   const STATUS_SUCCESS = 'success';
   const STATUS_ERROR = 'error';
+  const STATUS_CLEANED = 'cleaned';
 
   protected $fillable = [
     'id',
-    'status',
     'type',
-    'src',
+    'status',
     'progress',
     'duration',
-    'config',
     'result',
-    'is_cleaned',
+    'data',
   ];
 
   protected $casts = [
     'progress' => 'int',
     'duration' => 'int',
-    'config' => 'collection',
     'result' => 'collection',
-    'is_cleaned' => 'bool',
+    'data' => 'collection',
   ];
 }

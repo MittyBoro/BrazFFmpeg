@@ -2,7 +2,6 @@
 
 namespace App\Services\FFmpeg\Traits;
 
-use App\Services\FFmpeg\TaskService;
 use ProtoneMedia\LaravelFFMpeg\Filters\TileFactory;
 
 trait ImagesTrait
@@ -10,8 +9,6 @@ trait ImagesTrait
   // 'preview', 'screenshots',
   public function makeImages($start, $count)
   {
-    $this->task->start('screenshots');
-
     $media = $this->ffmpeg;
 
     $interval = ($this->ffmpeg->getDurationInSeconds() - $start) / $count;
@@ -27,14 +24,10 @@ trait ImagesTrait
         ->export()
         ->save($this->storage->getPath("img_{$int}.jpg"));
     }
-
-    return $this->task->finish($this->storage->urls());
   }
 
   public function makeThumbnails()
   {
-    $this->task->start('thumbnails');
-
     $width = 160;
     $height = $this->heightByWidth($width);
     $duration = $this->ffmpeg->getDurationInSeconds();
@@ -72,17 +65,5 @@ trait ImagesTrait
       ->addFilter('-preset', 'ultrafast')
       ->addFilter('-filter:v', '-fps=fps=1')
       ->save($this->storage->getPath('thumbnails.jpg'));
-
-    return $this->task->finish($this->storage->urls());
-  }
-
-  // статус выполнения makeImages
-  public function statusImages($total): TaskService
-  {
-    $percentage = floor(($this->storage->filesCount() / $total) * 100);
-
-    $this->task->progress($percentage);
-
-    return $this->task;
   }
 }

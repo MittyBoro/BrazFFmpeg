@@ -2,28 +2,21 @@
 
 namespace App\Services\FFmpeg\Traits;
 
-use FFMpeg\Coordinate\Dimension;
-use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\Filters\Video\ClipFilter;
-use FFMpeg\Filters\Video\ResizeFilter;
-use FFMpeg\Filters\Video\VideoFilters;
 use FFMpeg\Format\Video\X264;
 
 trait TrailerTrait
 {
   // 'trailer',
-  public function makeTrailer($start, $count, $duration, $height)
+  public function makeTrailer($start, $count, $duration, $quality)
   {
-    $this->task->start('trailer');
-
     $file = $this->storage->getPath('trailer.mp4');
 
     $videoDuration = $this->ffmpeg->getDurationInSeconds() - $start - $duration;
 
     $interval = intval($videoDuration / $count); // interval between each clip
 
+    $height = (int) $quality;
     $width = $this->widthByHeight($height);
-    $height = (int) $height;
 
     $filter = '';
     for ($i = 0; $i < $count; $i++) {
@@ -58,7 +51,5 @@ trait TrailerTrait
         $this->task->progress($percentage);
       })
       ->save($file);
-
-    return $this->task->finish($this->storage->urls());
   }
 }

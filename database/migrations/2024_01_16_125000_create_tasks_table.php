@@ -14,15 +14,14 @@ return new class extends Migration {
     Schema::create('tasks', function (Blueprint $table) {
       $table->id();
 
-      $table->string('status')->nullable();
       $table->string('type')->nullable();
+      $table->string('status')->nullable();
+
       $table->unsignedInteger('progress')->default(0);
       $table->unsignedInteger('duration')->default(0);
 
-      $table->json('config')->default(new Expression('(JSON_ARRAY())'));
+      $table->json('data')->default(new Expression('(JSON_ARRAY())'));
       $table->json('result')->default(new Expression('(JSON_ARRAY())'));
-
-      $table->boolean('is_cleaned')->default(false);
 
       $table->timestamps();
     });

@@ -3,10 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessVideoJob;
-use App\Services\FFmpeg\DBService;
+use App\Models\Task;
 use App\Services\FFmpeg\FFmpegService;
-use App\Services\FFmpeg\StorageService;
-use App\Services\FFmpeg\TaskService;
 use Illuminate\Http\Request;
 
 class IndexController extends Controller
@@ -18,18 +16,15 @@ class IndexController extends Controller
       'src' => 'required|url',
     ]);
 
-    $service = FFmpegService::init(0, $data['src']);
-
-    return $service->getInfo();
+    return response()->json(FFmpegService::videoInfo($data['src']));
   }
 
   // состояние процесса
   public function state($id)
   {
-    $service = TaskService::init($id);
-    $list = $service->all();
+    $state = Task::find($id);
 
-    return response()->json($list);
+    return response()->json($state);
   }
 
   // создать изображения
@@ -42,12 +37,10 @@ class IndexController extends Controller
       'count' => 'nullable|numeric|between:1,500',
     ]);
 
-    $data['id'] = $id;
-
     $data['start'] = $data['start'] ?? 0;
     $data['count'] = $data['count'] ?? 1;
 
-    ProcessVideoJob::dispatch('images', $data);
+    ProcessVideoJob::dispatch($id, 'images', $data);
 
     return response()->json(['success' => true]);
   }
@@ -59,9 +52,7 @@ class IndexController extends Controller
       'src' => 'required|url',
     ]);
 
-    $data['id'] = $id;
-
-    ProcessVideoJob::dispatch('thumbnails', $data);
+    ProcessVideoJob::dispatch($id, 'thumbnails', $data);
 
     return response()->json(['success' => true]);
   }
@@ -78,12 +69,10 @@ class IndexController extends Controller
       'quality' => 'nullable|numeric|between:200,5000',
     ]);
 
-    $data['id'] = $id;
-
     $data['start'] = $data['start'] ?? 0;
     $data['quality'] = $data['quality'] ?? 480;
 
-    ProcessVideoJob::dispatch('trailer', $data);
+    ProcessVideoJob::dispatch($id, 'trailer', $data);
 
     return response()->json(['success' => true]);
   }
@@ -96,9 +85,7 @@ class IndexController extends Controller
       'quality' => 'required|numeric|between:200,5000',
     ]);
 
-    $data['id'] = $id;
-
-    ProcessVideoJob::dispatch('resize', $data);
+    ProcessVideoJob::dispatch($id, 'resize', $data);
 
     return response()->json(['success' => true]);
   }

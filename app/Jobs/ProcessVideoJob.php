@@ -18,17 +18,16 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 
   public $timeout = 10800; // 3 hours
 
-  protected $data = [];
-  protected $type;
+  protected $id;
 
   private $service;
   /**
    * Create a new job instance.
    */
-  public function __construct($type, $data)
+  public function __construct($id, $type, $data)
   {
-    $this->type = $type;
-    $this->data = $data;
+    $this->id = $id;
+    TaskService::create($id, $type, $data);
   }
 
   /**
@@ -36,65 +35,18 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
-    $this->service = FFmpegService::init(
-      $this->data['id'],
-      $this->data['src'],
-      $this->data,
-      true,
-    );
-
-    switch ($this->type) {
-      case 'images':
-        $this->makeImages();
-        break;
-      case 'thumbnails':
-        $this->makeThumbnails();
-        break;
-      case 'trailer':
-        $this->makeTrailer();
-        break;
-      case 'resize':
-        $this->makeResize();
-        break;
-    }
+    $ffmpegService = FFmpegService::init($this->id);
+    $ffmpegService->start();
   }
 
   public function failed(Throwable $exception)
   {
-    $taskService = TaskService::init($this->data['id']);
-
+    $taskService = TaskService::init($this->id);
     $taskService->fail($exception->getMessage());
-  }
-
-  private function makeImages()
-  {
-    ProgressImagesJob::dispatch($this->data)->onQueue('additional');
-
-    $this->service->makeImages($this->data['start'], $this->data['count']);
-  }
-
-  private function makeThumbnails()
-  {
-    $this->service->makeThumbnails();
-  }
-
-  private function makeTrailer()
-  {
-    $this->service->makeTrailer(
-      $this->data['start'],
-      $this->data['count'],
-      $this->data['duration'],
-      $this->data['quality'],
-    );
-  }
-
-  private function makeResize()
-  {
-    $this->service->makeResize($this->data['quality']);
   }
 
   public function uniqueId()
   {
-    return $this->data['id'];
+    return $this->id;
   }
 }
