@@ -28,7 +28,7 @@ class CleanTasks extends Command
    */
   public function handle()
   {
-    $hoursAgo = Carbon::now()->subMinutes(180);
+    $hoursAgo = Carbon::now()->subHours(12);
 
     $tasks = Task::where('is_cleaned', false)
       ->where('updated_at', '<', $hoursAgo)
