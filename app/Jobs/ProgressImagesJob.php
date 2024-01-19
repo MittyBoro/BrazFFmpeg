@@ -4,12 +4,13 @@ namespace App\Jobs;
 
 use App\Services\FFmpeg\FFmpegService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ProgressImagesJob implements ShouldQueue
+class ProgressImagesJob implements ShouldQueue, ShouldBeUnique
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -41,5 +42,10 @@ class ProgressImagesJob implements ShouldQueue
       sleep($this->sleep);
       $task = $service->statusImages($this->data['count']);
     } while ($task->isProcessing());
+  }
+
+  public function uniqueId()
+  {
+    return $this->data['id'];
   }
 }

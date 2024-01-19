@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Throwable;
 
-class ProcessVideoJob implements ShouldQueue
+class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -91,5 +91,10 @@ class ProcessVideoJob implements ShouldQueue
   private function makeResize()
   {
     $this->service->makeResize($this->data['quality']);
+  }
+
+  public function uniqueId()
+  {
+    return $this->data['id'];
   }
 }

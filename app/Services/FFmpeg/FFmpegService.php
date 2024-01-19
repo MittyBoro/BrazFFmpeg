@@ -41,7 +41,7 @@ class FFmpegService
     }
   }
 
-  public static function init($id, $src, array $data = [])
+  public static function init($id, $src, array $data = [], $clearDir = false)
   {
     $src = str_replace('127.0.0.1', 'minio', $src);
     return new self($id, $src, $data);
