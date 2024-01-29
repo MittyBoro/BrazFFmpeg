@@ -17,11 +17,14 @@ class ReplaceSrcForLocal
   public function handle(Request $request, Closure $next): Response
   {
     // Проверяем, что приложение находится в локальной среде
-    if (App::environment('local')) {
-      // Получаем значение src из запроса и заменяем 127.0.0.1 на minio
-      $src = $request->input('src');
-      if ($src) {
+    $src = $request->input('src');
+    if ($src) {
+      if (App::environment('local')) {
         $request->merge(['src' => str_replace('127.0.0.1', 'minio', $src)]);
+      } else {
+        $request->merge([
+          'src' => preg_replace('/:\/\/(s\d+)\./', '://$1-ghost.', $src),
+        ]);
       }
     }
 
