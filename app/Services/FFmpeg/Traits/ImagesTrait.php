@@ -9,6 +9,11 @@ trait ImagesTrait
   // 'preview', 'screenshots',
   public function makeImages($start, $count)
   {
+    $duration = $this->ffmpeg->getDurationInSeconds();
+    if ($start > $duration) {
+      $start = floor($duration / 5);
+    }
+
     $media = $this->ffmpeg;
 
     $interval = ($this->ffmpeg->getDurationInSeconds() - $start) / $count;
@@ -63,7 +68,7 @@ trait ImagesTrait
           ->generateVTT($this->storage->getPath('thumbnails.vtt'));
       })
       ->addFilter('-preset', 'ultrafast')
-      ->addFilter('-filter:v', '-fps=fps=1')
+      ->addFilter('-filter:v', '-fps=fps=10')
       ->save($this->storage->getPath('thumbnails.jpg'));
   }
 }

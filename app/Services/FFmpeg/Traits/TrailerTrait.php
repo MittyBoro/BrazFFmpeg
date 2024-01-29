@@ -13,6 +13,10 @@ trait TrailerTrait
 
     $videoDuration = $this->ffmpeg->getDurationInSeconds() - $start - $duration;
 
+    if ($start > $videoDuration) {
+      $start = 0;
+    }
+
     $interval = intval($videoDuration / $count); // interval between each clip
 
     $height = (int) $quality;
