@@ -33,6 +33,7 @@ class RefreshTasks extends Command
       ->whereDate('updated_at', '<', Carbon::now()->subHours(3))
       ->get()
       ->each(function ($task) {
+        \Log::info("Task {$task->id} [{$task->type}] refreshed");
         ProcessVideoJob::dispatch($task->id, $task->type, $task->data);
       });
   }
