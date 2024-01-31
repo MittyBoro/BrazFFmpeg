@@ -198,7 +198,7 @@ return [
   'environments' => [
     'production' => [
       'supervisor-1' => [
-        'maxProcesses' => 2,
+        'maxProcesses' => 1,
       ],
     ],
 
