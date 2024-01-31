@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Task;
 use App\Services\FFmpeg\FFmpegService;
 use App\Services\FFmpeg\TaskService;
 use Illuminate\Bus\Queueable;
@@ -27,7 +28,9 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
   public function __construct($id, $type, $data)
   {
     $this->id = $id;
-    TaskService::create($id, $type, $data);
+    if (!Task::find($id)) {
+      TaskService::create($id, $type, $data);
+    }
   }
 
   /**
