@@ -29,6 +29,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
     $this->id = $id;
     if (!Task::find($id)) {
       TaskService::create($id, $type, $data);
+      \Log::info("Task {$id} [{$type}] created");
     } else {
       \Log::info("Task {$id} [{$type}] already exists");
     }
