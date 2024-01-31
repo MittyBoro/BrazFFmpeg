@@ -30,7 +30,7 @@ class RefreshTasks extends Command
   public function handle()
   {
     Task::where('status', Task::STATUS_QUEUED)
-      ->where('updated_at', '<', Carbon::now()->subHours(3))
+      ->whereDate('updated_at', '<', Carbon::now()->subHours(3))
       ->get()
       ->each(function ($task) {
         ProcessVideoJob::dispatch($task->id, $task->type, $task->data);
