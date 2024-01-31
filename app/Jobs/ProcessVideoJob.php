@@ -21,7 +21,6 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 
   protected $id;
 
-  private $service;
   /**
    * Create a new job instance.
    */
@@ -38,6 +37,9 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
+    if (!Task::find($this->id)) {
+      return;
+    }
     $ffmpegService = FFmpegService::init($this->id);
     $ffmpegService->start();
   }

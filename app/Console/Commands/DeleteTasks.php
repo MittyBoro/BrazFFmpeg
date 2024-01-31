@@ -2,20 +2,19 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessVideoJob;
 use App\Models\Task;
 use App\Services\FFmpeg\StorageService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
-class RefreshTasks extends Command
+class DeleteTasks extends Command
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'app:refresh-tasks';
+  protected $signature = 'app:delete-tasks';
 
   /**
    * The console command description.
@@ -30,11 +29,12 @@ class RefreshTasks extends Command
   public function handle()
   {
     Task::where('status', Task::STATUS_QUEUED)
-      ->whereDate('updated_at', '<', Carbon::now()->subHours(3))
+      ->whereDate('updated_at', '<', Carbon::now()->subHours(12))
       ->get()
       ->each(function ($task) {
-        \Log::info("Task {$task->id} [{$task->type}] refreshed");
-        ProcessVideoJob::dispatch($task->id, $task->type, $task->data);
+        \Log::info("Task {$task->id} [{$task->type}] deleted");
+        StorageService::init($task->id)->delete();
+        $task->delete();
       });
   }
 }
