@@ -28,10 +28,19 @@ class CleanTasks extends Command
    */
   public function handle()
   {
-    $hoursAgo = Carbon::now()->subHours(18);
+    $hoursAgo = Carbon::now()->subHours(12);
+    $hoursAgo = Carbon::now()->subHours(12);
 
-    $tasks = Task::where('status', '!=', Task::STATUS_CLEANED)
-      ->where('updated_at', '<', $hoursAgo)
+    Task::where('status', Task::STATUS_SUCCESS)
+      ->where('updated_at', '<', Carbon::now()->subHours(12))
+      ->get()
+      ->each(function ($task) {
+        StorageService::init($task->id)->delete();
+        $task->update(['status' => Task::STATUS_CLEANED]);
+      });
+
+    Task::where('status', '!=', Task::STATUS_CLEANED)
+      ->where('updated_at', '<', Carbon::now()->subDays(5))
       ->get()
       ->each(function ($task) {
         StorageService::init($task->id)->delete();
