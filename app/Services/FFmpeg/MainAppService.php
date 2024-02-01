@@ -10,7 +10,7 @@ class MainAppService
   {
     $url = config('app.main_app_task_url');
     try {
-      $post = Http::post($url, $task);
+      $post = Http::retry(3, 1000)->post($url, $task);
       if (!$post->ok()) {
         throw new \Exception($post->body());
       }
