@@ -35,7 +35,9 @@ class TaskService
     $this->model->progress = 0;
     $this->model->created_at = now();
     $this->model->save();
+
     \Log::info("Task {$this->model->id} [{$this->model->type}] started");
+    $this->sendToMainApp();
   }
 
   public function finish($result)
@@ -44,6 +46,7 @@ class TaskService
     $this->stop($result);
 
     \Log::info("Task {$this->model->id} [{$this->model->type}] success");
+    $this->sendToMainApp();
   }
 
   public function fail($result)
@@ -64,11 +67,15 @@ class TaskService
       $this->model->created_at,
     )->diffInSeconds(now());
     $this->model->save();
+
+    $this->sendToMainApp();
   }
 
   public function progress($percentage)
   {
     $this->model->update(['progress' => $percentage]);
+
+    $this->sendToMainApp();
   }
 
   public function get($key)
@@ -89,5 +96,10 @@ class TaskService
   public function isStarted()
   {
     return $this->model->status !== Task::STATUS_QUEUED;
+  }
+
+  public function sendToMainApp()
+  {
+    return MainAppService::post($this->model->toArray());
   }
 }

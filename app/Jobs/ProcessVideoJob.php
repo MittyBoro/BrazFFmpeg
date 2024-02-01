@@ -29,9 +29,6 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
     $this->id = $id;
     if (!Task::find($id)) {
       TaskService::create($id, $type, $data);
-      \Log::info("Task {$id} [{$type}] created");
-    } else {
-      \Log::info("Task {$id} [{$type}] already exists");
     }
   }
 
@@ -45,6 +42,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
       return;
     }
     $ffmpegService = FFmpegService::init($this->id);
+
     $ffmpegService->start();
   }
 
