@@ -19,6 +19,8 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 
   public $timeout = 10800; // 3 hours
 
+  public $tries = 3;
+
   protected $id;
 
   /**
