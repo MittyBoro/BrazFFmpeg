@@ -29,7 +29,7 @@ class CleanTasks extends Command
   public function handle()
   {
     Task::where('status', Task::STATUS_SUCCESS)
-      ->where('updated_at', '<', Carbon::now()->subHours(16))
+      ->where('updated_at', '<', Carbon::now()->subHours(12))
       ->get()
       ->each(function ($task) {
         StorageService::init($task->id)->delete();
