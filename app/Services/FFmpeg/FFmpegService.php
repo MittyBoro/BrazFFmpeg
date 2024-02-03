@@ -38,7 +38,7 @@ class FFmpegService
 
   public function start()
   {
-    if ($this->task->isStarted()) {
+    if ($this->task->isStarted() && !$this->task->isRestartable()) {
       return;
     }
 

@@ -33,6 +33,7 @@ class TaskService
   {
     $this->model->status = Task::STATUS_PROCESSING;
     $this->model->progress = 0;
+    $this->model->result = [];
     $this->model->created_at = now();
     $this->model->save();
 
@@ -96,6 +97,14 @@ class TaskService
   public function isStarted()
   {
     return $this->model->status !== Task::STATUS_QUEUED;
+  }
+
+  public function isRestartable()
+  {
+    return in_array($this->model->status, [
+      Task::STATUS_CLEANED,
+      Task::STATUS_ERROR,
+    ]);
   }
 
   public function sendToMainApp()
