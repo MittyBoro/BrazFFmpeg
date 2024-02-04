@@ -29,6 +29,16 @@ class TaskService
     ]);
   }
 
+  public function restart()
+  {
+    if ($this->isRestartable()) {
+      $this->model->status = Task::STATUS_QUEUED;
+      $this->model->progress = 0;
+      $this->model->result = [];
+      $this->model->save();
+    }
+  }
+
   public function start()
   {
     $this->model->status = Task::STATUS_PROCESSING;
