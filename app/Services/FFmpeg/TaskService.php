@@ -57,6 +57,7 @@ class TaskService
     $this->stop($result);
 
     \Log::info("Task {$this->model->id} [{$this->model->type}] success");
+    sleep(1);
     $this->sendToMainApp();
   }
 
