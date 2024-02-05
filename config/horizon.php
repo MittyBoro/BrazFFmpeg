@@ -2,6 +2,19 @@
 
 use Illuminate\Support\Str;
 
+$supervisor = [
+  'connection' => 'redis',
+  'balance' => 'auto',
+  'autoScalingStrategy' => 'time',
+  'maxProcesses' => 10,
+  'maxTime' => 0,
+  'maxJobs' => 0,
+  'memory' => 4096,
+  'tries' => 1,
+  'timeout' => 10800,
+  'nice' => 0,
+];
+
 return [
   /*
     |--------------------------------------------------------------------------
@@ -166,7 +179,7 @@ return [
     |
     */
 
-  'memory_limit' => 64,
+  'memory_limit' => 256,
 
   /*
     |--------------------------------------------------------------------------
@@ -181,30 +194,44 @@ return [
 
   'defaults' => [
     'supervisor-1' => [
-      'connection' => 'redis',
+      ...$supervisor,
       'queue' => ['default'],
-      'balance' => 'auto',
-      'autoScalingStrategy' => 'time',
-      'maxProcesses' => 2,
-      'maxTime' => 0,
-      'maxJobs' => 0,
-      'memory' => 4096,
-      'tries' => 1,
-      'timeout' => 10800,
-      'nice' => 0,
+      'timeout' => 1800,
+    ],
+    'supervisor-2' => [
+      ...$supervisor,
+      'queue' => ['resize'],
+      'timeout' => 1800,
+    ],
+    'supervisor-3' => [
+      ...$supervisor,
+      'queue' => ['additional'],
+      'timeout' => 1800,
     ],
   ],
 
   'environments' => [
     'production' => [
       'supervisor-1' => [
-        'maxProcesses' => 3,
+        'maxProcesses' => 10,
+      ],
+      'supervisor-2' => [
+        'maxProcesses' => 2,
+      ],
+      'supervisor-3' => [
+        'maxProcesses' => 1,
       ],
     ],
 
     'local' => [
       'supervisor-1' => [
+        'maxProcesses' => 10,
+      ],
+      'supervisor-2' => [
         'maxProcesses' => 2,
+      ],
+      'supervisor-3' => [
+        'maxProcesses' => 1,
       ],
     ],
   ],

@@ -40,7 +40,7 @@ class IndexController extends Controller
     $data['start'] = $data['start'] ?? 0;
     $data['count'] = $data['count'] ?? 1;
 
-    ProcessVideoJob::dispatch($id, 'images', $data);
+    ProcessVideoJob::dispatch($id, 'images', $data)->onQueue('additional');
 
     return response()->json(['success' => true]);
   }
@@ -52,7 +52,7 @@ class IndexController extends Controller
       'src' => 'required|url',
     ]);
 
-    ProcessVideoJob::dispatch($id, 'thumbnails', $data);
+    ProcessVideoJob::dispatch($id, 'thumbnails', $data)->onQueue('additional');
 
     return response()->json(['success' => true]);
   }
@@ -72,7 +72,7 @@ class IndexController extends Controller
     $data['start'] = $data['start'] ?? 0;
     $data['quality'] = $data['quality'] ?? 480;
 
-    ProcessVideoJob::dispatch($id, 'trailer', $data);
+    ProcessVideoJob::dispatch($id, 'trailer', $data)->onQueue('additional');
 
     return response()->json(['success' => true]);
   }
@@ -85,7 +85,7 @@ class IndexController extends Controller
       'quality' => 'required|numeric|between:200,5000',
     ]);
 
-    ProcessVideoJob::dispatch($id, 'resize', $data);
+    ProcessVideoJob::dispatch($id, 'resize', $data)->onQueue('resize');
 
     return response()->json(['success' => true]);
   }
