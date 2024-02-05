@@ -213,7 +213,7 @@ return [
   'environments' => [
     'production' => [
       'supervisor-1' => [
-        'maxProcesses' => 10,
+        'maxProcesses' => 3,
       ],
       'supervisor-2' => [
         'maxProcesses' => 2,
@@ -225,7 +225,7 @@ return [
 
     'local' => [
       'supervisor-1' => [
-        'maxProcesses' => 10,
+        'maxProcesses' => 3,
       ],
       'supervisor-2' => [
         'maxProcesses' => 2,
