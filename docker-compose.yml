@@ -24,7 +24,7 @@ services:
       - global_network
     depends_on:
       - redis
-    cpus: 3
+    cpus: 1.5
   mysql:
     image: 'mysql/mysql-server:8.0'
     ports:

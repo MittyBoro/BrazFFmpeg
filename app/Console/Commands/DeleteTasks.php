@@ -29,7 +29,7 @@ class DeleteTasks extends Command
   public function handle()
   {
     Task::whereIn('status', [Task::STATUS_QUEUED, Task::STATUS_PROCESSING])
-      ->whereDate('updated_at', '<', Carbon::now()->subHours(12))
+      ->where('updated_at', '<', Carbon::now()->subHours(12))
       ->get()
       ->each(function ($task) {
         \Log::info("Task {$task->id} [{$task->type}] deleted");
