@@ -201,12 +201,12 @@ return [
     'supervisor-2' => [
       ...$supervisor,
       'queue' => ['resize'],
-      'timeout' => 1800,
+      'timeout' => 21600,
     ],
     'supervisor-3' => [
       ...$supervisor,
       'queue' => ['additional'],
-      'timeout' => 1800,
+      'timeout' => 3600,
     ],
   ],
 

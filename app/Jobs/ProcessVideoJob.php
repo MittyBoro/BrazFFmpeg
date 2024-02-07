@@ -17,7 +17,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 {
   use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-  public $timeout = 10800; // 3 hours
+  public $timeout = 21600; // 6 hours
 
   public $tries = 3;
 
