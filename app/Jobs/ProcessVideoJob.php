@@ -55,6 +55,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
   {
     $taskService = TaskService::init($this->id);
     $taskService->fail($exception->getMessage());
+    $taskService->delete();
   }
 
   public function uniqueId()

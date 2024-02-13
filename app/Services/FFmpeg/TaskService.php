@@ -71,6 +71,13 @@ class TaskService
     );
   }
 
+  public function delete()
+  {
+    \Log::info("Task {$this->model->id} [{$this->model->type}] deleted");
+    StorageService::init($this->model->id)->delete();
+    $this->model->delete();
+  }
+
   private function stop($result)
   {
     $this->model->result = $result ?? [];
