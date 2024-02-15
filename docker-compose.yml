@@ -1,6 +1,5 @@
 services:
-  laravel.test:
-    hostname: laravelffmpeg
+  laravelffmpeg:
     build:
       context: ./docker/8.3
       dockerfile: Dockerfile
@@ -24,7 +23,13 @@ services:
       - global_network
     depends_on:
       - redis
-    cpus: 1.5
+    cpus: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
   mysql:
     image: 'mysql/mysql-server:8.0'
     ports:

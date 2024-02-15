@@ -120,4 +120,9 @@ class FFmpegService
     $h = intval(($with * $oldHeight) / $oldWidth);
     return ceil($h / 2) * 2;
   }
+
+  public function __destruct()
+  {
+    FFMpeg::cleanupTemporaryFiles();
+  }
 }
