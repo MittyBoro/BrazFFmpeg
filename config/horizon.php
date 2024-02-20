@@ -216,7 +216,7 @@ return [
         'maxProcesses' => 3,
       ],
       'supervisor-2' => [
-        'maxProcesses' => 2,
+        'maxProcesses' => 1,
       ],
       'supervisor-3' => [
         'maxProcesses' => 1,
@@ -228,7 +228,7 @@ return [
         'maxProcesses' => 3,
       ],
       'supervisor-2' => [
-        'maxProcesses' => 2,
+        'maxProcesses' => 1,
       ],
       'supervisor-3' => [
         'maxProcesses' => 1,

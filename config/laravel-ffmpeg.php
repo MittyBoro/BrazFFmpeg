@@ -4,7 +4,7 @@ return [
   'ffmpeg' => [
     'binaries' => env('FFMPEG_BINARIES', 'ffmpeg'),
 
-    'threads' => 3, // set to false to disable the default 'threads' filter
+    'threads' => 6, // set to false to disable the default 'threads' filter
   ],
 
   'ffprobe' => [
