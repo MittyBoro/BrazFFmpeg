@@ -11,7 +11,7 @@ $supervisor = [
   'maxJobs' => 0,
   'memory' => 4096,
   'tries' => 1,
-  'timeout' => 10800,
+  'timeout' => 21600,
   'nice' => 0,
 ];
 
