@@ -196,16 +196,19 @@ return [
     'supervisor-1' => [
       ...$supervisor,
       'queue' => ['default'],
+      'maxProcesses' => 3,
       'timeout' => 1800,
     ],
     'supervisor-2' => [
       ...$supervisor,
       'queue' => ['resize'],
+      'maxProcesses' => 1,
       'timeout' => 21600,
     ],
     'supervisor-3' => [
       ...$supervisor,
       'queue' => ['additional'],
+      'maxProcesses' => 1,
       'timeout' => 3600,
     ],
   ],
