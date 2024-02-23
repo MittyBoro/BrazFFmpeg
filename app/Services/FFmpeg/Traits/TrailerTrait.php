@@ -7,7 +7,7 @@ use FFMpeg\Format\Video\X264;
 trait TrailerTrait
 {
   // 'trailer',
-  public function makeTrailer($start, $count, $duration, $quality)
+  public function makeTrailer($start, $count, $duration, $quality): void
   {
     $file = $this->storage->getPath('trailer.mp4');
 
@@ -50,7 +50,6 @@ trait TrailerTrait
       ->export()
       ->inFormat($format)
       ->onProgress(function ($percentage, $remaining) {
-        \Log::info('progress', [$percentage, $remaining]);
         $this->task->progress($percentage);
       })
       ->beforeSaving(function ($commands) {

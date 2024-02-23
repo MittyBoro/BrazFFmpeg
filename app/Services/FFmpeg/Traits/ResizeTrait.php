@@ -8,10 +8,10 @@ use ProtoneMedia\LaravelFFMpeg\Support\StreamParser;
 trait ResizeTrait
 {
   // 'resize',
-  public function makeResize($quality)
+  public function makeResize($quality): void
   {
+    $path = $this->storage->getPath('result.mp4');
     $height = intval($quality);
-    $width = $this->widthByHeight($quality);
 
     if ($quality <= 240) {
       $kiloBitrate = 256;
@@ -29,38 +29,36 @@ trait ResizeTrait
     $inputKiloBitrate = intval($inputBitrate / 1000);
     $kiloBitrate = min($inputKiloBitrate, $kiloBitrate);
 
-    $format = (new X264())->setPasses(1)->setKiloBitrate($kiloBitrate);
+    $format = (new X264())
+      ->setPasses(1)
+      ->setKiloBitrate($kiloBitrate)
+      ->setAudioChannels(2)
+      ->setAudioKiloBitrate(128)
+      ->setAdditionalParameters(['-vf', "[in]scale=-2:{$height}[out]"]);
 
-    $inputFps = ceil(
-      StreamParser::new($this->ffmpeg->getVideoStream())->getFrameRate() ?? 30,
-    );
-    $fps = min($inputFps, 30);
+    $inputFps =
+      StreamParser::new($this->ffmpeg->getVideoStream())->getFrameRate() ?? 30;
 
-    $video = $this->ffmpeg
+    $this->ffmpeg
       ->export()
-      ->addFilter(
-        '-r',
-        $fps,
-        '-preset',
-        'veryfast', // Выбор предустановки
-        '-c:a',
-        'aac', // Выбор кодека AAC для аудио
-        '-b:a',
-        '128k', // Установка битрейта для аудио на 128 кбит/с
-        '-ac',
-        '2', // Установка количества аудиоканалов на 2 (стерео)
-        '-pix_fmt',
-        'yuv420p', // Установка цветового формата видео (yuv420p)
-        '-movflags',
-        '+faststart', // Установка флага faststart для ускоренного воспроизведения веб-видео
-        '-y', // Принудительное подтверждение перезаписи выходного файла
-      )
+      ->addFilter('-r', min($inputFps, 30))
+      ->addFilter('-preset', 'veryfast')
+      ->addFilter('-movflags', '+faststart')
       ->inFormat($format)
-      ->resize($width, $height)
       ->onProgress(function ($percentage, $remaining) {
-        $this->task->progress($percentage);
-      });
-
-    $video->save($this->storage->getPath('result.mp4'));
+        if ($percentage % 2 == 0) {
+          $this->task->progress($percentage);
+        }
+      })
+      ->beforeSaving(function ($commands) {
+        $except = ['-flags', '+loop'];
+        $commands[0] = array_filter($commands[0], function ($command) use (
+          $except,
+        ) {
+          return !in_array($command, $except);
+        });
+        return $commands;
+      })
+      ->save($path);
   }
 }
