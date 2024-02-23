@@ -16,43 +16,51 @@ trait TrailerTrait
     if ($start > $videoDuration) {
       $start = 0;
     }
-
     $interval = intval($videoDuration / $count); // interval between each clip
-
     $height = (int) $quality;
-    $width = $this->widthByHeight($height);
 
-    $filter = '';
+    $filterComplex = '';
+    $clips = [];
     for ($i = 0; $i < $count; $i++) {
       $clipStart = $start + $i * $interval;
       $clipEnd = $clipStart + $duration;
 
       $key = "[out{$i}]";
       $clips[] = $key;
-      $filter .= "[0:v]trim=start={$clipStart}:end={$clipEnd},setpts=PTS-STARTPTS,scale={$width}:{$height}{$key}; ";
+      $filterComplex .= "[0:v]select=between(t\,{$clipStart}\,{$clipEnd}){$key};";
     }
-    $filter .= implode('', $clips) . "concat=n={$count}:v=1:a=0";
+    $format = (new X264())
+      ->setPasses(1)
+      ->setKiloBitrate(768)
+      ->setAudioKiloBitrate(100);
+
+    $filterComplex .= implode(';', [
+      implode('', $clips) . "concat=n={$count}[out]",
+      "[out]scale=-2:{$height}[out]",
+      '[out]setpts=N/FRAME_RATE/TB[out]',
+    ]);
 
     $this->ffmpeg
-      ->addFilter('-filter_complex', $filter)
+      ->addFilter('-filter_complex', "$filterComplex")
+      ->addFilter('-map', '[out]')
       ->addFilter('-an')
-
-      ->addFilter(
-        '-r',
-        '25',
-        '-preset',
-        'ultrafast', // Выбор предустановки ultrafast для кодирования (очень быстрое кодирование)
-        '-pix_fmt',
-        'yuv420p', // Установка цветового формата видео (yuv420p)
-        '-movflags',
-        '+faststart', // Установка флага faststart для ускоренного воспроизведения веб-видео
-        '-y', // Принудительное подтверждение перезаписи выходного файла
-      )
-
+      ->addFilter('-r', '25')
+      ->addFilter('-preset', 'ultrafast')
+      ->addFilter('-movflags', '+faststart')
       ->export()
-      ->inFormat((new X264())->setPasses(1)->setKiloBitrate(768))
+      ->inFormat($format)
       ->onProgress(function ($percentage, $remaining) {
+        \Log::info('progress', [$percentage, $remaining]);
         $this->task->progress($percentage);
+      })
+      ->beforeSaving(function ($commands) {
+        $except = ['-flags', '+loop', '-acodec', 'aac', '-b:a', '100k'];
+        $commands[0] = array_filter($commands[0], function ($command) use (
+          $except,
+        ) {
+          return !in_array($command, $except);
+        });
+        return $commands;
       })
       ->save($file);
   }
