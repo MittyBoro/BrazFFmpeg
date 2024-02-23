@@ -23,7 +23,7 @@ services:
       - global_network
     depends_on:
       - redis
-    cpus: 3
+    cpus: 6
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
