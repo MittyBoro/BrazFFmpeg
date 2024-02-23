@@ -72,7 +72,7 @@ class IndexController extends Controller
     $data['start'] = $data['start'] ?? 0;
     $data['quality'] = $data['quality'] ?? 480;
 
-    ProcessVideoJob::dispatch($id, 'trailer', $data)->onQueue('additional');
+    ProcessVideoJob::dispatch($id, 'trailer', $data)->onQueue('resize');
 
     return response()->json(['success' => true]);
   }
