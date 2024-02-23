@@ -179,7 +179,7 @@ return [
     |
     */
 
-  'memory_limit' => 4096,
+  'memory_limit' => 2048,
 
   /*
     |--------------------------------------------------------------------------
@@ -231,9 +231,11 @@ return [
         'maxProcesses' => 3,
       ],
       'supervisor-2' => [
+        'queue' => ['resize', 'additional'],
         'maxProcesses' => 1,
       ],
       'supervisor-3' => [
+        'queue' => ['empty'],
         'maxProcesses' => 1,
       ],
     ],

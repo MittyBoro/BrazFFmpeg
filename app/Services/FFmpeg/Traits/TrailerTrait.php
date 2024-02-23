@@ -50,7 +50,7 @@ trait TrailerTrait
       )
 
       ->export()
-      ->inFormat((new X264())->setKiloBitrate(512))
+      ->inFormat((new X264())->setPasses(1)->setKiloBitrate(768))
       ->onProgress(function ($percentage, $remaining) {
         $this->task->progress($percentage);
       })
