@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 
-class StateController extends Controller
+class TaskController extends Controller
 {
   // состояние процесса
-  public function state($id)
+  public function status($id)
   {
     $state = Task::find($id);
 
