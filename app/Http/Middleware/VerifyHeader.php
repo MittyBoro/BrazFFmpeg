@@ -16,6 +16,7 @@ class VerifyHeader
   public function handle(Request $request, Closure $next): Response
   {
     $secretHeaderValue = $request->header('X-Secret-Key');
+    \Log::info('aaaaaaa', [$secretHeaderValue]);
 
     // Проверяем, что заголовок существует и содержит нужное значение
     if ($request->header('X-Secret-Key') !== config('app.secret_key')) {
