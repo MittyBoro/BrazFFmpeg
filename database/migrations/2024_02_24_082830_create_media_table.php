@@ -14,7 +14,6 @@ return new class extends Migration {
       $table->id();
       $table->string('url')->unique();
       $table->string('path')->nullable();
-      $table->string('is_loaded')->default(false);
 
       $table->timestamp('last_used_at')->nullable();
       $table->timestamps();

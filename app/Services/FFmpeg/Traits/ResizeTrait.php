@@ -46,11 +46,12 @@ trait ResizeTrait
       ->addFilter('-movflags', '+faststart')
       ->inFormat($format)
       ->onProgress(function ($percentage, $remaining) {
+        // so-so
+        // if ($percentage % 5 == 0 && $this->task->isStopped()) {
+        //   $this->killProcess();
+        // }
         if ($percentage % 2 == 0) {
           $this->task->progress($percentage);
-        }
-        if ($percentage % 5 == 0 && $this->task->isStopped()) {
-          throw new \Exception('Task stopped');
         }
       })
       ->beforeSaving(function ($commands) {

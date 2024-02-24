@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
 
-class ReplaceSrcForLocal
+class ReplaceSrc
 {
   /**
    * Handle an incoming request.
@@ -16,7 +16,6 @@ class ReplaceSrcForLocal
    */
   public function handle(Request $request, Closure $next): Response
   {
-    // Проверяем, что приложение находится в локальной среде
     $src = $request->input('src');
     if ($src) {
       if (App::environment('local')) {

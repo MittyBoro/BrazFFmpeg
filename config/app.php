@@ -58,7 +58,7 @@ return [
 
   'asset_url' => env('ASSET_URL'),
 
-  'main_app_task_url' => env('MAIN_APP_TASK_URL'),
+  'secret_key' => env('API_SECRET_KEY'),
 
   /*
     |--------------------------------------------------------------------------

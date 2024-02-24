@@ -3,16 +3,14 @@
 namespace App\Models;
 
 use GuzzleHttp\Client;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
-  protected $fillable = ['url', 'path', 'is_loaded', 'last_used_at'];
+  protected $fillable = ['url', 'path', 'last_used_at'];
 
   protected $casts = [
-    'is_loaded' => 'boolean',
     'last_used_at' => 'datetime',
   ];
 

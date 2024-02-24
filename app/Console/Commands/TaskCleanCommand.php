@@ -7,21 +7,21 @@ use App\Services\FFmpeg\StorageService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
-class CleanTasks extends Command
+class TaskCleanCommand extends Command
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'app:clean-tasks';
+  protected $signature = 'task:clean';
 
   /**
    * The console command description.
    *
    * @var string
    */
-  protected $description = 'Command description';
+  protected $description = 'Clear old tasks';
 
   /**
    * Execute the console command.

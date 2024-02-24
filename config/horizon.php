@@ -193,50 +193,38 @@ return [
     */
 
   'defaults' => [
-    'supervisor-1' => [
-      ...$supervisor,
-      'queue' => ['default'],
-      'maxProcesses' => 3,
-      'timeout' => 1800,
-    ],
-    'supervisor-2' => [
-      ...$supervisor,
-      'queue' => ['video'],
-      'maxProcesses' => 1,
-      'timeout' => 21600,
-    ],
-    'supervisor-3' => [
-      ...$supervisor,
-      'queue' => ['image'],
-      'maxProcesses' => 1,
-      'timeout' => 3600,
-    ],
+    'supervisor-1' => [...$supervisor, 'timeout' => 1800],
+    'supervisor-2' => [...$supervisor, 'timeout' => 21600],
+    'supervisor-3' => [...$supervisor, 'timeout' => 3600],
   ],
 
   'environments' => [
     'production' => [
       'supervisor-1' => [
-        'maxProcesses' => 3,
+        'queue' => ['default'],
+        'maxProcesses' => 5,
       ],
       'supervisor-2' => [
+        'queue' => ['video'],
         'maxProcesses' => 1,
+        'balance' => false,
       ],
       'supervisor-3' => [
+        'queue' => ['image'],
         'maxProcesses' => 1,
+        'balance' => false,
       ],
     ],
 
     'local' => [
       'supervisor-1' => [
+        'queue' => ['default'],
         'maxProcesses' => 3,
       ],
       'supervisor-2' => [
-        'queue' => ['video', 'image'],
+        'queue' => ['image', 'video'],
         'maxProcesses' => 1,
-      ],
-      'supervisor-3' => [
-        'queue' => ['empty'],
-        'maxProcesses' => 1,
+        'balance' => false,
       ],
     ],
   ],

@@ -14,16 +14,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('replaceSrcForLocal')->group(function () {
-  Route::prefix('/tasks/create')->group(function () {
+Route::prefix('/tasks')->group(function () {
+  Route::prefix('/create')->group(function () {
     Route::post('/images', 'CreateController@images');
     Route::post('/thumbnails', 'CreateController@thumbnails');
     Route::post('/trailer', 'CreateController@trailer');
     Route::post('/resize', 'CreateController@resize');
   });
 
-  Route::get('/tasks/{id}', 'TaskController@status');
-  Route::post('/tasks/{id}/stop', 'TaskController@stop');
-
-  Route::post('/specifications', 'InfoController');
+  Route::get('/{id}', 'TaskController@status');
+  Route::post('/{id}/stop', 'TaskController@stop');
 });
+
+Route::post('/specifications', 'InfoController');

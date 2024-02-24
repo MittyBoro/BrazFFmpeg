@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 
-#[ObservedBy([TaskObserver::class])]
 class Task extends Model
 {
   // sync with App FFmpegApiService
@@ -41,7 +40,7 @@ class Task extends Model
 
   public function media()
   {
-    return $this->belongsTo(Media::class, 'media');
+    return $this->belongsTo(Media::class);
   }
 
   public static function createTask(string $type, array $data)
@@ -70,6 +69,7 @@ class Task extends Model
 
     if (!$this->media) {
       $media = Media::firstOrCreate(['url' => $this->data['src']]);
+
       if (!$media->path) {
         return false;
       }
@@ -102,6 +102,8 @@ class Task extends Model
 
   public function start()
   {
+    \Log::debug("Task {$this->id} started");
+
     $this->media()->update(['last_used_at' => now()]);
 
     $this->status = Task::STATUS_PROCESSING;
@@ -119,6 +121,7 @@ class Task extends Model
 
   public function finish($result)
   {
+    \Log::debug("Task {$this->id} finish");
     $this->status = Task::STATUS_SUCCESS;
     $this->progress = 100;
     $this->duration = Carbon::parse($this->created_at)->diffInSeconds(now());
@@ -128,12 +131,7 @@ class Task extends Model
 
   public function fail($result)
   {
-    if ($this->isStopped()) {
-      $this->result = ['stopped' => $result];
-      $this->save();
-      return;
-    }
-
+    \Log::debug("Task {$this->id} fail:", [$result]);
     $this->status = Task::STATUS_ERROR;
     $this->duration = Carbon::parse($this->created_at)->diffInSeconds(now());
     $this->result = ['error' => $result];

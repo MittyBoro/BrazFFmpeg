@@ -18,7 +18,7 @@ class TaskObserver
       $queue = 'image';
     }
 
-    ProcessVideoJob::dispatch($task->id)->onQueue($queue);
+    \App\Jobs\ProcessVideoJob::dispatch($task->id)->onQueue($queue);
   }
 
   /**
@@ -28,7 +28,7 @@ class TaskObserver
   {
     if ($task->webhook_url) {
       try {
-        Http::retry(3, 1000)->post($task->webhook_url, $task);
+        Http::retry(3, 2000)->post($task->webhook_url, $task);
       } catch (\Throwable $th) {
         \Log::error($th->getMessage());
       }

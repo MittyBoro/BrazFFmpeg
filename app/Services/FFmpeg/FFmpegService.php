@@ -44,7 +44,9 @@ class FFmpegService
       $result = $this->start();
       $this->task->finish($result);
     } catch (\Throwable $exception) {
-      $this->task->fail($exception->getMessage());
+      if (!$this->task->isStopped()) {
+        $this->task->fail($exception->getMessage());
+      }
     }
   }
 
@@ -82,5 +84,13 @@ class FFmpegService
     } else {
       return $urls;
     }
+  }
+
+  private function killProcess(): void
+  {
+    $processId = shell_exec('pgrep ffmpeg');
+    \Log::debug("Kill process: {$processId}");
+    $result = shell_exec('kill ' . $processId);
+    \Log::debug("Kill result: {$result}");
   }
 }

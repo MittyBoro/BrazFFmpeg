@@ -12,8 +12,9 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule): void
   {
-    $schedule->command('app:clean-tasks')->everyFifteenMinutes();
-    $schedule->command('app:delete-tasks')->everyTenMinutes();
+    $schedule->command('media:delete')->hourlyAt(13);
+    $schedule->command('task:delete')->everyThirtyMinutes();
+    $schedule->command('task:clean')->hourlyAt(19);
   }
 
   /**
