@@ -11,6 +11,10 @@ class StorageService
   public function __construct($id)
   {
     $this->directory = '/video/' . $id;
+
+    if (Storage::exists($this->directory)) {
+      $this->delete();
+    }
   }
 
   public static function init($id)

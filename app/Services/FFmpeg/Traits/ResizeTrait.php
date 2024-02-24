@@ -49,6 +49,9 @@ trait ResizeTrait
         if ($percentage % 2 == 0) {
           $this->task->progress($percentage);
         }
+        if ($percentage % 5 == 0 && $this->task->isStopped()) {
+          throw new \Exception('Task stopped');
+        }
       })
       ->beforeSaving(function ($commands) {
         $except = ['-flags', '+loop'];

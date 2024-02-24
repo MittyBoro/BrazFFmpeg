@@ -16,6 +16,13 @@ return new class extends Migration {
 
       $table->string('type')->nullable();
       $table->string('status')->nullable();
+      $table->string('webhook_url')->nullable();
+
+      $table
+        ->foreignId('media_id')
+        ->nullable()
+        ->constrained('media')
+        ->nullOnDelete();
 
       $table->unsignedInteger('progress')->default(0);
       $table->unsignedInteger('duration')->default(0);

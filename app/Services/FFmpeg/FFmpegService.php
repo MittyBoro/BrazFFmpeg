@@ -2,50 +2,57 @@
 
 namespace App\Services\FFmpeg;
 
+use App\Models\Task;
 use App\Services\FFmpeg\Traits\ImagesTrait;
 use App\Services\FFmpeg\Traits\ResizeTrait;
+use App\Services\FFmpeg\Traits\ThumbnailsTrait;
 use App\Services\FFmpeg\Traits\TrailerTrait;
-use Illuminate\Support\Facades\Http;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
 class FFmpegService
 {
   use ImagesTrait;
   use ResizeTrait;
+  use ThumbnailsTrait;
   use TrailerTrait;
 
   private $ffmpeg;
 
-  private TaskService $task;
+  private Task $task;
   private StorageService $storage;
 
-  public function __construct($id)
+  public static function run(Task $task): void
   {
-    $this->storage = StorageService::init($id);
-    $this->task = TaskService::init($id);
+    $instance = new self($task);
 
-    $src = $this->task->getData('src');
-    $this->checkSrc($src);
+    $instance->justDoIt();
 
-    $this->ffmpeg = FFMpeg::openUrl($src);
-    $this->storage->delete();
+    FFMpeg::cleanupTemporaryFiles();
   }
 
-  public static function init($id)
+  public function __construct(Task $task)
   {
-    return new self($id);
+    $this->task = $task;
+    $this->storage = StorageService::init($task->id);
+
+    $this->ffmpeg = FFMpeg::open($this->task->mediaPath());
   }
 
-  public function start()
+  public function justDoIt(): void
   {
-    if ($this->task->isStarted() && !$this->task->isRestartable()) {
-      return;
+    try {
+      $result = $this->start();
+      $this->task->finish($result);
+    } catch (\Throwable $exception) {
+      $this->task->fail($exception->getMessage());
     }
+  }
 
-    $type = $this->task->getType();
+  private function start(): array
+  {
     $this->task->start();
 
-    switch ($type) {
+    switch ($this->task->type) {
       case 'images':
         $this->makeImages(
           $this->task->getData('start'),
@@ -68,61 +75,12 @@ class FFmpegService
         break;
     }
 
-    $result = $this->storage->urls();
+    $urls = $this->storage->urls();
 
-    if (!count($result)) {
-      $this->task->fail('Files not found');
+    if (!count($urls)) {
+      throw new \Exception("Files for task {$this->task->id} not found");
     } else {
-      $this->task->finish($result);
+      return $urls;
     }
-  }
-
-  public static function videoInfo($src)
-  {
-    $ffmpeg = FFMpeg::openUrl($src);
-    $dimensions = $ffmpeg->getVideoStream()->getDimensions();
-    $duration = $ffmpeg->getDurationInSeconds();
-    return [
-      'width' => $dimensions->getWidth(),
-      'height' => $dimensions->getHeight(),
-      'duration' => $duration,
-    ];
-  }
-
-  private function checkSrc($src)
-  {
-    $head = Http::head($src);
-    if ($head->failed()) {
-      throw new \Exception("Video {$src} not found");
-    }
-  }
-
-  private function getDimensions()
-  {
-    $dimensions = $this->ffmpeg->getVideoStream()->getDimensions();
-    return [
-      'width' => $dimensions->getWidth(),
-      'height' => $dimensions->getHeight(),
-    ];
-  }
-
-  private function widthByHeight($height)
-  {
-    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getDimensions();
-
-    $w = intval(($height * $oldWidth) / $oldHeight);
-    return ceil($w / 2) * 2;
-  }
-  private function heightByWidth($with)
-  {
-    ['width' => $oldWidth, 'height' => $oldHeight] = $this->getDimensions();
-
-    $h = intval(($with * $oldHeight) / $oldWidth);
-    return ceil($h / 2) * 2;
-  }
-
-  public function __destruct()
-  {
-    FFMpeg::cleanupTemporaryFiles();
   }
 }

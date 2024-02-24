@@ -201,13 +201,13 @@ return [
     ],
     'supervisor-2' => [
       ...$supervisor,
-      'queue' => ['resize'],
+      'queue' => ['video'],
       'maxProcesses' => 1,
       'timeout' => 21600,
     ],
     'supervisor-3' => [
       ...$supervisor,
-      'queue' => ['additional'],
+      'queue' => ['image'],
       'maxProcesses' => 1,
       'timeout' => 3600,
     ],
@@ -231,7 +231,7 @@ return [
         'maxProcesses' => 3,
       ],
       'supervisor-2' => [
-        'queue' => ['resize', 'additional'],
+        'queue' => ['video', 'image'],
         'maxProcesses' => 1,
       ],
       'supervisor-3' => [

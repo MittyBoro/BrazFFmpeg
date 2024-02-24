@@ -15,12 +15,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('replaceSrcForLocal')->group(function () {
-  Route::post('/info', 'IndexController@info');
-  Route::prefix('{id}')->group(function () {
-    Route::get('/state', 'IndexController@state');
-    Route::post('/images', 'IndexController@images');
-    Route::post('/thumbnails', 'IndexController@thumbnails');
-    Route::post('/trailer', 'IndexController@trailer');
-    Route::post('/resize', 'IndexController@resize');
+  Route::post('/info', 'InfoController');
+  Route::prefix('/create')->group(function () {
+    Route::post('/images', 'CreateController@images');
+    Route::post('/thumbnails', 'CreateController@thumbnails');
+    Route::post('/trailer', 'CreateController@trailer');
+    Route::post('/resize', 'CreateController@resize');
   });
+  Route::post('/state/{id}', 'StateController@state');
+  Route::post('/stop/{id}', 'StateController@stop');
 });

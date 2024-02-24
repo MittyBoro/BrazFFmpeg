@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Models\Task;
 use App\Services\FFmpeg\FFmpegService;
-use App\Services\FFmpeg\TaskService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,22 +18,17 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 
   public $timeout = 21600; // 6 hours
 
-  public $tries = 3;
+  public $tries = 15;
+  public $maxExceptions = 3;
 
-  protected $id;
+  public $id = [];
 
   /**
    * Create a new job instance.
    */
-  public function __construct($id, $type, $data)
+  public function __construct($id)
   {
     $this->id = $id;
-    if (!Task::find($id)) {
-      TaskService::create($id, $type, $data);
-    } else {
-      $taskService = TaskService::init($id);
-      $taskService->restart();
-    }
   }
 
   /**
@@ -42,20 +36,23 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
    */
   public function handle(): void
   {
-    if (!Task::find($this->id)) {
-      \Log::info("Task {$this->id} not found");
+    $task = Task::find($this->id);
+    if (!$task || !$task->isQueued()) {
+      \Log::error("Task {$this->id} not found or not queued");
       return;
     }
-    $ffmpegService = FFmpegService::init($this->id);
 
-    $ffmpegService->start();
+    if (!$task->isStartable()) {
+      $this->release(60);
+      return;
+    }
+
+    FFmpegService::run($task);
   }
 
   public function failed(Throwable $exception)
   {
-    $taskService = TaskService::init($this->id);
-    $taskService->fail($exception->getMessage());
-    $taskService->delete();
+    Task::find($this->id)?->fail($exception->getMessage());
   }
 
   public function uniqueId()
