@@ -32,9 +32,14 @@ class TaskDeleteCommand extends Command
     Task::whereIn('status', [Task::STATUS_PROCESSING])
       ->where('updated_at', '<', Carbon::now()->subHour())
       ->get()
-      ->each(function ($task) {
-        StorageService::init($task->id)->delete();
-        $task->delete();
+      ->each(function (Task $task) {
+        $task->status = Task::STATUS_QUEUED;
+        $task->progress = 0;
+        $task->duration = 0;
+        $task->result = [];
+        $task->save();
+
+        // $task->delete();
       });
   }
 }

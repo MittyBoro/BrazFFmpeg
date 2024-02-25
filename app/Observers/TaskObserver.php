@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Jobs\ProcessVideoJob;
 use App\Models\Task;
+use App\Services\FFmpeg\StorageService;
 use Http;
 
 class TaskObserver
@@ -33,5 +34,13 @@ class TaskObserver
         \Log::error($th->getMessage());
       }
     }
+  }
+
+  /**
+   * Handle the Task "deleted" event.
+   */
+  public function deleted(Task $task): void
+  {
+    StorageService::init($task->id)->delete();
   }
 }
