@@ -50,9 +50,7 @@ trait ResizeTrait
         // if ($percentage % 5 == 0 && $this->task->isStopped()) {
         //   $this->killProcess();
         // }
-        if ($percentage % 2 == 0) {
-          $this->task->progress($percentage);
-        }
+        $this->task->progress($percentage);
       })
       ->beforeSaving(function ($commands) {
         $except = ['-flags', '+loop'];
