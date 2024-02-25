@@ -206,7 +206,7 @@ return [
       ],
       'supervisor-2' => [
         'queue' => ['video'],
-        'maxProcesses' => 1,
+        'maxProcesses' => 2,
         'balance' => false,
       ],
       'supervisor-3' => [
