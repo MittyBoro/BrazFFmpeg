@@ -44,21 +44,28 @@ class Media extends Model
     $response = $client->get($this->url, ['stream' => true]);
     $stream = $response->getBody();
 
-    Storage::put($path, $stream);
+    $fileSize = $response->getHeader('Content-Length');
 
-    if (Storage::exists($path)) {
-      if (Storage::size($path) < 1024) {
-        Storage::delete($path);
-        if ($retry) {
-          return $this->downloadFile(false);
+    if (!empty($fileSize)) {
+      $fileSize = $fileSize[0];
+
+      Storage::put($path, $stream);
+
+      if (Storage::exists($path) && Storage::size($path) == $fileSize) {
+        if (Storage::size($path) < 1024) {
+          Storage::delete($path);
+          if ($retry) {
+            return $this->downloadFile(false);
+          }
+        } else {
+          $this->last_used_at = now();
+          $this->path = $path;
+          $this->save();
+          return;
         }
-      } else {
-        $this->last_used_at = now();
-        $this->path = $path;
-        $this->save();
       }
-    } else {
-      throw new \Exception('Failed to download file');
     }
+    $this->delete();
+    throw new \Exception('Failed to download file');
   }
 }
