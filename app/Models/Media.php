@@ -36,7 +36,7 @@ class Media extends Model
     return $this->hasMany(Task::class);
   }
 
-  public function downloadFile()
+  public function downloadFile($retry = true)
   {
     $path = "files/{$this->id}_" . basename($this->url);
 
@@ -49,11 +49,14 @@ class Media extends Model
     if (Storage::exists($path)) {
       if (Storage::size($path) < 1024) {
         Storage::delete($path);
-        throw new \Exception('Failed to download file (less than 1KB)');
+        if ($retry) {
+          return $this->downloadFile(false);
+        }
+      } else {
+        $this->last_used_at = now();
+        $this->path = $path;
+        $this->save();
       }
-      $this->last_used_at = now();
-      $this->path = $path;
-      $this->save();
     } else {
       throw new \Exception('Failed to download file');
     }
