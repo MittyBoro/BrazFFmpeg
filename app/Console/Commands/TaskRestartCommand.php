@@ -2,26 +2,27 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ProcessVideoJob;
 use App\Models\Task;
 use App\Services\FFmpeg\StorageService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 
-class TaskDeleteCommand extends Command
+class TaskRestartCommand extends Command
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'task:delete';
+  protected $signature = 'task:restart';
 
   /**
    * The console command description.
    *
    * @var string
    */
-  protected $description = 'Deleting old unfinished tasks';
+  protected $description = 'Restart old unfinished tasks';
 
   /**
    * Execute the console command.
@@ -39,6 +40,14 @@ class TaskDeleteCommand extends Command
         $task->result = [];
         $task->save();
 
+        ProcessVideoJob::dispatch($task->id)->onQueue($task->getQueue());
+        // $task->delete();
+      });
+    Task::whereIn('status', [Task::STATUS_QUEUED])
+      ->where('updated_at', '<', Carbon::now()->subHours(6))
+      ->get()
+      ->each(function (Task $task) {
+        ProcessVideoJob::dispatch($task->id)->onQueue($task->getQueue());
         // $task->delete();
       });
   }

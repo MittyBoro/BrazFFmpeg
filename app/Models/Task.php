@@ -61,6 +61,11 @@ class Task extends Model
     return $task;
   }
 
+  public function getQueue()
+  {
+    return in_array($this->type, ['images', 'thumbnails']) ? 'image' : 'video';
+  }
+
   public function isStartable()
   {
     if (!$this->isQueued()) {
