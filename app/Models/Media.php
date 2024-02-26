@@ -47,6 +47,10 @@ class Media extends Model
     Storage::put($path, $stream);
 
     if (Storage::exists($path)) {
+      if (Storage::size($path) < 1024) {
+        Storage::delete($path);
+        throw new \Exception('Failed to download file (less than 1KB)');
+      }
       $this->last_used_at = now();
       $this->path = $path;
       $this->save();
