@@ -127,6 +127,8 @@ class Task extends Model
   public function finish($result)
   {
     \Log::debug("Task {$this->id} finish");
+    $this->media()->update(['last_used_at' => now()]);
+
     $this->status = Task::STATUS_SUCCESS;
     $this->progress = 100;
     $this->duration = Carbon::parse($this->created_at)->diffInSeconds(now());
