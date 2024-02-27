@@ -21,7 +21,9 @@ class Media extends Model
     });
 
     static::deleted(function ($media) {
-      Storage::delete($media->path);
+      if ($media->path) {
+        Storage::delete($media->path);
+      }
     });
   }
 
@@ -59,6 +61,10 @@ class Media extends Model
           $this->save();
           return;
         }
+      } else {
+        \Log::debug('File size does not match', [
+          Storage::size($path) == $fileSize,
+        ]);
       }
     } else {
       \Log::debug('File size not found');
