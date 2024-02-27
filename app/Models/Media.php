@@ -23,12 +23,6 @@ class Media extends Model
     static::deleted(function ($media) {
       Storage::delete($media->path);
     });
-
-    static::retrieved(function ($media) {
-      if (!$media->path || !Storage::exists($media->path)) {
-        $media->downloadFile();
-      }
-    });
   }
 
   public function tasks()
@@ -38,6 +32,8 @@ class Media extends Model
 
   public function downloadFile($retry = true)
   {
+    \Log::debug("Download file [{$this->id}] {$this->url}");
+
     $path = "files/{$this->id}_" . basename($this->url);
 
     $client = new Client();
