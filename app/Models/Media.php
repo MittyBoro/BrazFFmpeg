@@ -60,6 +60,8 @@ class Media extends Model
           return;
         }
       }
+    } else {
+      \Log::debug('File size not found');
     }
     $this->delete();
     throw new \Exception('Failed to download file');
