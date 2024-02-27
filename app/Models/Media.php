@@ -63,7 +63,8 @@ class Media extends Model
         }
       } else {
         \Log::debug('File size does not match', [
-          Storage::size($path) == $fileSize,
+          Storage::size($path),
+          $fileSize,
         ]);
       }
     } else {
