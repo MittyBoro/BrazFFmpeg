@@ -23,7 +23,10 @@ class TaskObserver
   public function updated(Task $task): void
   {
     if ($task->webhook_url) {
-      $response = Http::retry(3, 2000)->post($task->webhook_url, $task);
+      $response = Http::retry(3, 2000, throw: false)->post(
+        $task->webhook_url,
+        $task,
+      );
       $status = $response->status();
 
       if ((int) $status >= 400 && $status < 500) {
