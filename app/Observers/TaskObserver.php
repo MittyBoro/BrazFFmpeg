@@ -29,8 +29,12 @@ class TaskObserver
       );
       $status = $response->status();
 
-      if ((int) $status >= 400 && $status < 500) {
-        $task->fail($response->body());
+      if (
+        (int) $status >= 400 &&
+        $status < 500 &&
+        $task->wasChanged('status')
+      ) {
+        $task->fail($response->body(), false);
       }
     }
   }
