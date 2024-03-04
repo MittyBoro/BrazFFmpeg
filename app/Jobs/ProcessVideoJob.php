@@ -18,7 +18,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
 
   public $timeout = 21600; // 6 hours
 
-  public $tries = 15;
+  public $tries = 30;
   public $maxExceptions = 3;
 
   public $id = [];
@@ -43,7 +43,7 @@ class ProcessVideoJob implements ShouldQueue, ShouldBeUnique
     }
 
     if (!$task->isStartable()) {
-      $this->release(60);
+      $this->release(90);
       return;
     }
 
