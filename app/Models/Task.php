@@ -136,9 +136,11 @@ class Task extends Model
     $this->save();
   }
 
-  public function fail($result)
+  public function fail($result, bool $log = true)
   {
-    \Log::debug("Task {$this->id} fail:", [$result]);
+    if ($log) {
+      \Log::debug("Task {$this->id} fail:", [$result]);
+    }
     $this->status = Task::STATUS_ERROR;
     $this->duration = Carbon::parse($this->created_at)->diffInSeconds(now());
     $this->result = ['error' => $result];
